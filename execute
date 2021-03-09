@@ -1,0 +1,21 @@
+#!/bin/bash
+
+PROGRAM_NAME="A3"
+
+# Create the build folder or clean it
+if [ ! -d "./build" ]
+then
+	mkdir build
+	cd build
+else
+	cd build
+	rm -rf *
+fi
+
+# Make the project
+cmake ..
+make -j
+
+# Run it
+./$PROGRAM_NAME ../resources
+
