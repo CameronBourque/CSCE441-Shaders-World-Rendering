@@ -9,7 +9,7 @@
 class Program;
 
 /**
- * A bunny defined by a list of triangles
+ * A shape defined by a list of triangles
  * - posBuf should be of length 3*ntris
  * - norBuf should be of length 3*ntris (if normals are available)
  * - texBuf should be of length 2*ntris (if texture coords are available)

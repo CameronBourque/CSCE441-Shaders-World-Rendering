@@ -26,7 +26,7 @@ THE SOFTWARE.
 // version 1.0.3 : Support parsing texture options(#85)
 // version 1.0.2 : Improve parsing speed by about a factor of 2 for large
 // files(#105)
-// version 1.0.1 : Fixes a bunny is lost if obj ends with a 'usemtl'(#104)
+// version 1.0.1 : Fixes a shape is lost if obj ends with a 'usemtl'(#104)
 // version 1.0.0 : Change data structure. Change license from BSD to MIT.
 //
 
@@ -291,8 +291,8 @@ class MaterialStreamReader : public MaterialReader {
 };
 
 /// Loads .obj from a file.
-/// 'attrib', 'shapes' and 'materials' will be filled with parsed bunny data
-/// 'shapes' will be filled with parsed bunny data
+/// 'attrib', 'shapes' and 'materials' will be filled with parsed shape data
+/// 'shapes' will be filled with parsed shape data
 /// Returns true when loading .obj become success.
 /// Returns warning and error message into `err`
 /// 'mtl_basedir' is optional, and used for base directory for .mtl file.
@@ -1467,7 +1467,7 @@ bool LoadObj(attrib_t *attrib, std::vector<shape_t> *shapes,
       }
 
       if (newMaterialId != material) {
-        // Create per-face material. Thus we don't add `bunny` to `shapes` at
+        // Create per-face material. Thus we don't add `shape` to `shapes` at
         // this time.
         // just clear `faceGroup` after `exportFaceGroupToShape()` call.
         exportFaceGroupToShape(&shape, faceGroup, tags, material, name,
@@ -1619,7 +1619,7 @@ bool LoadObj(attrib_t *attrib, std::vector<shape_t> *shapes,
                                     triangulate);
   // exportFaceGroupToShape return false when `usemtl` is called in the last
   // line.
-  // we also add `bunny` to `shapes` when `bunny.mesh` has already some
+  // we also add `shape` to `shapes` when `shape.mesh` has already some
   // faces(indices)
   if (ret || shape.mesh.indices.size()) {
     shapes->push_back(shape);

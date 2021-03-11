@@ -29,7 +29,6 @@ string RESOURCE_DIR = "./"; // Where the resources are loaded from
 bool OFFLINE = false;
 
 shared_ptr<Camera> camera;
-shared_ptr<Program> normal_prog;
 shared_ptr<Shape> bunny;
 shared_ptr<ShaderManager> shader_manager;
 
@@ -191,7 +190,7 @@ static void render()
 
 	shader_manager->bind(P);
 
-	// Transform the bunny
+	// Transform the shape
 	MV->pushMatrix();
     MV->translate(0, -0.5, 0);
     MV->scale(0.5, 0.5, 0.5);
