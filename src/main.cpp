@@ -20,6 +20,7 @@
 #include "MatrixStack.h"
 #include "Program.h"
 #include "Shape.h"
+#include "ShaderManager.h"
 
 using namespace std;
 
@@ -28,8 +29,9 @@ string RESOURCE_DIR = "./"; // Where the resources are loaded from
 bool OFFLINE = false;
 
 shared_ptr<Camera> camera;
-shared_ptr<Program> prog;
-shared_ptr<Shape> shape;
+shared_ptr<Program> normal_prog;
+shared_ptr<Shape> bunny;
+shared_ptr<ShaderManager> shader_manager;
 
 bool keyToggles[256] = {false}; // only for English keyboards!
 
@@ -76,6 +78,27 @@ static void cursor_position_callback(GLFWwindow* window, double xmouse, double y
 static void char_callback(GLFWwindow *window, unsigned int key)
 {
 	keyToggles[key] = !keyToggles[key];
+
+    switch ((char)key)
+    {
+        // Change the shader
+        case 's':
+            shader_manager->changeProgram();
+            break;
+        case 'S':
+            shader_manager->changeProgram(true);
+            break;
+        // Change the material
+        case 'm':
+            shader_manager->changeMaterial();
+            break;
+        case 'M':
+            shader_manager->changeMaterial(true);
+            break;
+        // Do nothing
+        default:
+            break;
+    }
 }
 
 // If the window is resized, capture the new size and reset the viewport
@@ -117,22 +140,14 @@ static void init()
 	// Enable z-buffer test.
 	glEnable(GL_DEPTH_TEST);
 
-	prog = make_shared<Program>();
-	prog->setShaderNames(RESOURCE_DIR + "normal_vert.glsl", RESOURCE_DIR + "normal_frag.glsl");
-	prog->setVerbose(true);
-	prog->init();
-	prog->addAttribute("aPos");
-	prog->addAttribute("aNor");
-	prog->addUniform("MV");
-	prog->addUniform("P");
-	prog->setVerbose(false);
+	shader_manager = make_shared<ShaderManager>(RESOURCE_DIR);
 	
 	camera = make_shared<Camera>();
 	camera->setInitDistance(2.0f); // Camera's initial Z translation
 	
-	shape = make_shared<Shape>();
-	shape->loadMesh(RESOURCE_DIR + "bunny.obj");
-	shape->init();
+	bunny = make_shared<Shape>();
+	bunny->loadMesh(RESOURCE_DIR + "bunny.obj");
+	bunny->init();
 	
 	GLSL::checkError(GET_FILE_LINE);
 }
@@ -173,12 +188,16 @@ static void render()
 	camera->applyProjectionMatrix(P);
 	MV->pushMatrix();
 	camera->applyViewMatrix(MV);
-	
-	prog->bind();
-	glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
-	glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
-	shape->draw(prog);
-	prog->unbind();
+
+	shader_manager->bind(P);
+
+	// Transform the bunny
+	MV->pushMatrix();
+    MV->translate(0, -0.5, 0);
+    MV->scale(0.5, 0.5, 0.5);
+	shader_manager->draw(bunny, MV);
+	MV->popMatrix();
+	shader_manager->unbind();
 	
 	MV->popMatrix();
 	P->popMatrix();
@@ -212,7 +231,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 	// Create a windowed mode window and its OpenGL context.
-	window = glfwCreateWindow(640, 480, "YOUR NAME", NULL, NULL);
+	window = glfwCreateWindow(640, 480, "Cameron Bourque", NULL, NULL);
 	if(!window) {
 		glfwTerminate();
 		return -1;
