@@ -7,11 +7,11 @@ uniform vec3 ks;
 uniform float s;
 
 varying vec4 p; // in camera space
-varying vec3 n; // in camera space
+varying vec3 cNor; // in camera space
 
 void main()
 {
-	//vec3 n = normalize(normal.xyz);
+	vec3 n = normalize(cNor);
 
 	// get ambient component
 	vec3 ca = ka;

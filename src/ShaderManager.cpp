@@ -43,8 +43,8 @@ ShaderManager::ShaderManager(std::string resDir) :
     );
     materials.push_back(pinkish);
 
-    std::shared_ptr<Material> blueGreen = std::make_shared<Material>(glm::vec3(0.0f, 0.0f, 0.1f),  // Ka
-                                                                     glm::vec3(0.0f, 0.0f, 1.0f),  // Kd
+    std::shared_ptr<Material> blueGreen = std::make_shared<Material>(glm::vec3(0.0f, 0.0f, 0.4f),  // Ka
+                                                                     glm::vec3(0.0f, 0.0f, 0.6f),  // Kd
                                                                      glm::vec3(0.0f, 1.0f, 0.0f),  // Ks
                                                                      100                      // s
     );
