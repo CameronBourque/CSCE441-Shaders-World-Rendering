@@ -3,8 +3,7 @@
 ShaderManager::ShaderManager(std::string resDir) :
     programSelection(0),
     materialSelection(0),
-    lightSelection(0),
-    lightPos(1.0f, 1.0f, 1.0f)
+    lightSelection(0)
 {
     // Set up normal shader
     std::shared_ptr<Program> normal = std::make_shared<Program>();
@@ -177,7 +176,7 @@ void ShaderManager::bind(std::shared_ptr<MatrixStack>& P)
     programs[programSelection]->bind();
     glUniformMatrix4fv(programs[programSelection]->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
 
-    // If using Blinn Phong shader need to set more uniforms
+    // If using Blinn Phong or Cel shader need to set more uniforms
     if(programSelection == 1 || programSelection == 3)
     {
         glm::vec3 lightPos[2];

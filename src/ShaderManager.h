@@ -41,8 +41,6 @@ private:
 
     std::vector<std::shared_ptr<Light>> lights;
     unsigned int lightSelection;
-
-    glm::vec3 lightPos; // TODO: replace with lights class
 };
 
 #endif
