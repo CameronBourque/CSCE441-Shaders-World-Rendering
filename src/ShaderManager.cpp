@@ -50,6 +50,26 @@ ShaderManager::ShaderManager(std::string resDir) :
     silhouette->setVerbose(false);
     programs.push_back(silhouette);
 
+    // Set up cel shader
+
+    std::shared_ptr<Program> cel = std::make_shared<Program>();
+    cel->setShaderNames(resDir + "cel_vert.glsl", resDir + "cel_frag.glsl");
+    cel->setVerbose(true);
+    cel->init();
+    cel->addAttribute("aPos");
+    cel->addAttribute("aNor");
+    cel->addUniform("ITMV");
+    cel->addUniform("MV");
+    cel->addUniform("P");
+    cel->addUniform("lightPos");
+    cel->addUniform("lightColor");
+    cel->addUniform("ka");
+    cel->addUniform("kd");
+    cel->addUniform("ks");
+    cel->addUniform("s");
+    cel->setVerbose(false);
+    programs.push_back(cel);
+
     // Set up materials
     std::shared_ptr<Material> pinkish = std::make_shared<Material>(glm::vec3(0.2f, 0.2f, 0.2f),  // Ka
                                                                    glm::vec3(0.8f, 0.7f, 0.7f),  // Kd
@@ -158,7 +178,7 @@ void ShaderManager::bind(std::shared_ptr<MatrixStack>& P)
     glUniformMatrix4fv(programs[programSelection]->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
 
     // If using Blinn Phong shader need to set more uniforms
-    if(programSelection == 1)
+    if(programSelection == 1 || programSelection == 3)
     {
         glm::vec3 lightPos[2];
         glm::vec3 lightColor[2];
@@ -190,8 +210,8 @@ void ShaderManager::draw(std::shared_ptr<Shape>& bunny, std::shared_ptr<MatrixSt
     // Add MV
     glUniformMatrix4fv(programs[programSelection]->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
 
-    // If using Blinn Phong or Silhouette shader need to use inverse transpose matrix
-    if(programSelection == 1 || programSelection == 2)
+    // If not using Normal shader need to use inverse transpose matrix
+    if(programSelection != 0)
     {
         glUniformMatrix4fv(programs[programSelection]->getUniform("ITMV"), 1, GL_FALSE,
                            glm::value_ptr(glm::transpose(glm::inverse(MV->topMatrix()))));
