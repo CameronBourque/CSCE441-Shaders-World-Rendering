@@ -27,7 +27,7 @@ public:
 
     void bind(std::shared_ptr<MatrixStack>& P);
     void unbind();
-    void draw(std::shared_ptr<Shape>& bunny, std::shared_ptr<MatrixStack>& MV);
+    void draw(std::shared_ptr<Shape>& shape, std::shared_ptr<MatrixStack>& MV);
 
     void moveLightX(bool decrement = false) { lights[lightSelection]->moveXPos(decrement); }
     void moveLightY(bool decrement = false) { lights[lightSelection]->moveYPos(decrement); }

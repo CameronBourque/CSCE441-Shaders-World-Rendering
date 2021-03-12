@@ -30,6 +30,7 @@ bool OFFLINE = false;
 
 shared_ptr<Camera> camera;
 shared_ptr<Shape> bunny;
+shared_ptr<Shape> teapot;
 shared_ptr<ShaderManager> shader_manager;
 
 bool keyToggles[256] = {false}; // only for English keyboards!
@@ -166,6 +167,10 @@ static void init()
 	bunny = make_shared<Shape>();
 	bunny->loadMesh(RESOURCE_DIR + "bunny.obj");
 	bunny->init();
+
+	teapot = make_shared<Shape>();
+	teapot->loadMesh(RESOURCE_DIR + "teapot.obj");
+	teapot->init();
 	
 	GLSL::checkError(GET_FILE_LINE);
 }
@@ -209,11 +214,21 @@ static void render()
 
 	shader_manager->bind(P);
 
-	// Transform the shape
-	MV->pushMatrix();
-    MV->translate(0, -0.5, 0);
-    MV->scale(0.5, 0.5, 0.5);
+	// Transform the shapes
+	MV->pushMatrix();   // Bunny
+    MV->translate(-0.5f, -0.5f, 0.0f);
+    MV->scale(0.5f, 0.5f, 0.5f);
+    MV->rotate(t, 0.0f, 1.0f, 0.0f);
 	shader_manager->draw(bunny, MV);
+	MV->popMatrix();
+	MV->pushMatrix();   // Teapot
+    MV->translate(0.5f, 0.0f, 0.0f);
+    glm::mat4 S(1.0f);
+    S[0][1] = 0.5f*cos(t);
+    MV->multMatrix(S);
+	MV->scale(0.5f, 0.5f, 0.5f);
+	MV->rotate(M_PI, 0.0f, 1.0f, 0.0f);
+	shader_manager->draw(teapot, MV);
 	MV->popMatrix();
 	shader_manager->unbind();
 	
