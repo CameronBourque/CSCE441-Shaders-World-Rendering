@@ -3,6 +3,7 @@
 ShaderManager::ShaderManager(std::string resDir) :
     programSelection(0),
     materialSelection(0),
+    lightSelection(0),
     lightPos(1.0f, 1.0f, 1.0f)
 {
     // Set up normal shader
@@ -28,6 +29,7 @@ ShaderManager::ShaderManager(std::string resDir) :
     blinnPhong->addUniform("MV");
     blinnPhong->addUniform("P");
     blinnPhong->addUniform("lightPos");
+    blinnPhong->addUniform("lightColor");
     blinnPhong->addUniform("ka");
     blinnPhong->addUniform("kd");
     blinnPhong->addUniform("ks");
@@ -52,11 +54,22 @@ ShaderManager::ShaderManager(std::string resDir) :
 
 
     std::shared_ptr<Material> grayish = std::make_shared<Material>(glm::vec3(0.1f, 0.1f, 0.1f),  // Ka
-                                                                   glm::vec3(0.5f, 0.5f, 0.7f),  // Kd
+                                                                   glm::vec3(0.5f, 0.5f, 0.6f),  // Kd
                                                                    glm::vec3(0.1f, 0.1f, 0.1f),  // Ks
                                                                    10                       // s
     );
     materials.push_back(grayish);
+
+    // Set up lights
+    std::shared_ptr<Light> l1 = std::make_shared<Light>(glm::vec3(0.8, 0.8, 0.8), // color
+                                                        glm::vec3(1.0, 1.0, 1.0) // light position
+    );
+    lights.push_back(l1);
+
+    std::shared_ptr<Light> l2 = std::make_shared<Light>(glm::vec3(0.2, 0.2, 0.0), // color
+                                                        glm::vec3(-1.0, 1.0, 1.0) // light position
+    );
+    lights.push_back(l2);
 }
 
 ShaderManager::~ShaderManager()
@@ -104,6 +117,27 @@ void ShaderManager::changeMaterial(bool decrement)
     }
 }
 
+void ShaderManager::changeLight(bool decrement)
+{
+    // Are we incrementing or decrementing?
+    if(!decrement)
+    {
+        // Check if need to go to start index
+        if(++lightSelection == lights.size())
+        {
+            lightSelection = 0;
+        }
+    }
+    else
+    {
+        // Check if need to go to end index
+        if(lightSelection-- == 0)
+        {
+            lightSelection = lights.size() - 1;
+        }
+    }
+}
+
 void ShaderManager::bind(std::shared_ptr<MatrixStack>& P)
 {
     // Bind and then set the perspective uniform matrix
@@ -113,7 +147,16 @@ void ShaderManager::bind(std::shared_ptr<MatrixStack>& P)
     // If using Blinn Phong shader need to set more uniforms
     if(programSelection == 1)
     {
-        glUniform3f(programs[programSelection]->getUniform("lightPos"), lightPos.x, lightPos.y, lightPos.z);
+        glm::vec3 lightPos[2];
+        glm::vec3 lightColor[2];
+        for(int i = 0; i < 2; i++)
+        {
+            lightPos[i] = lights[i]->getPosition();
+            lightColor[i] = lights[i]->getColor();
+        }
+        glUniform3fv(programs[programSelection]->getUniform("lightPos"), 2, glm::value_ptr(lightPos[0]));
+        glUniform3fv(programs[programSelection]->getUniform("lightColor"), 2, glm::value_ptr(lightColor[0]));
+
         glm::vec3 ka = materials[materialSelection]->getKA();
         glUniform3f(programs[programSelection]->getUniform("ka"), ka.x, ka.y, ka.z);
         glm::vec3 kd = materials[materialSelection]->getKD();

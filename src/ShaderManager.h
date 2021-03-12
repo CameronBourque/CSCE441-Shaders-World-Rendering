@@ -13,6 +13,7 @@
 #include "Material.h"
 #include "MatrixStack.h"
 #include "Shape.h"
+#include "Light.h"
 
 class ShaderManager
 {
@@ -22,9 +23,14 @@ public:
 
     void changeProgram(bool decrement = false);
     void changeMaterial(bool decrement = false);
+    void changeLight(bool decrement = false);
+
     void bind(std::shared_ptr<MatrixStack>& P);
     void unbind();
     void draw(std::shared_ptr<Shape>& bunny, std::shared_ptr<MatrixStack>& MV);
+
+    void moveLightX(bool decrement = false) { lights[lightSelection]->moveXPos(decrement); }
+    void moveLightY(bool decrement = false) { lights[lightSelection]->moveYPos(decrement); }
 
 private:
     std::vector<std::shared_ptr<Program>> programs;
@@ -32,6 +38,9 @@ private:
 
     std::vector<std::shared_ptr<Material>> materials;
     unsigned int materialSelection;
+
+    std::vector<std::shared_ptr<Light>> lights;
+    unsigned int lightSelection;
 
     glm::vec3 lightPos; // TODO: replace with lights class
 };

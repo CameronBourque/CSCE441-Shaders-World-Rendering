@@ -94,6 +94,25 @@ static void char_callback(GLFWwindow *window, unsigned int key)
         case 'M':
             shader_manager->changeMaterial(true);
             break;
+        // Change the light
+        case 'l':
+            shader_manager->changeLight();
+            break;
+        case 'L':
+            shader_manager->changeLight(true);
+            break;
+        // Change the position
+        case 'x':
+            shader_manager->moveLightX();
+            break;
+        case 'X':
+            shader_manager->moveLightX(true);
+            break;
+        case 'y':
+            shader_manager->moveLightY();
+            break;
+        case 'Y':
+            shader_manager->moveLightY(true);
         // Do nothing
         default:
             break;
