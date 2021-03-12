@@ -37,6 +37,19 @@ ShaderManager::ShaderManager(std::string resDir) :
     blinnPhong->setVerbose(false);
     programs.push_back(blinnPhong);
 
+    // Set up silhouette shader
+    std::shared_ptr<Program> silhouette = std::make_shared<Program>();
+    silhouette->setShaderNames(resDir + "silhouette_vert.glsl", resDir + "silhouette_frag.glsl");
+    silhouette->setVerbose(true);
+    silhouette->init();
+    silhouette->addAttribute("aPos");
+    silhouette->addAttribute("aNor");
+    silhouette->addUniform("ITMV");
+    silhouette->addUniform("MV");
+    silhouette->addUniform("P");
+    silhouette->setVerbose(false);
+    programs.push_back(silhouette);
+
     // Set up materials
     std::shared_ptr<Material> pinkish = std::make_shared<Material>(glm::vec3(0.2f, 0.2f, 0.2f),  // Ka
                                                                    glm::vec3(0.8f, 0.7f, 0.7f),  // Kd
@@ -177,7 +190,8 @@ void ShaderManager::draw(std::shared_ptr<Shape>& bunny, std::shared_ptr<MatrixSt
     // Add MV
     glUniformMatrix4fv(programs[programSelection]->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
 
-    if(programSelection == 1)
+    // If using Blinn Phong or Silhouette shader need to use inverse transpose matrix
+    if(programSelection == 1 || programSelection == 2)
     {
         glUniformMatrix4fv(programs[programSelection]->getUniform("ITMV"), 1, GL_FALSE,
                            glm::value_ptr(glm::transpose(glm::inverse(MV->topMatrix()))));
