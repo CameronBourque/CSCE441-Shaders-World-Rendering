@@ -15,7 +15,7 @@ void main()
 	float dotNE = dot(n, e);
 
 	// set the color
-	if(dotNE < 0.3)
+	if(dotNE < 0.3 && dotNE > -0.3)
 	{
 		gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 	}

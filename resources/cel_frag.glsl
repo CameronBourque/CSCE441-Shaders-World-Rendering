@@ -41,7 +41,7 @@ void main()
 
 	// get the color
 	vec3 color;
-	if(dotNE < 0.3)
+	if(dotNE < 0.3 && dotNE > -0.3)
 	{
 		gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 	}
