@@ -166,6 +166,9 @@ static void render()
     std::shared_ptr<MatrixStack> P = std::make_shared<MatrixStack>();
     std::shared_ptr<MatrixStack> MV = std::make_shared<MatrixStack>();
 
+    // Make sure the viewport is correct
+    glViewport(0, 0, width, height);
+
     // Apply projection matrix
     P->pushMatrix();
     camera->applyProjectionMatrix(P);
@@ -190,17 +193,28 @@ static void render()
     // If top down viewport is activated
     if(keyToggles[(unsigned)'t'])
     {
-        // TODO: FIX
+        // Set up region in bottom left to show this view
+        double s = 0.5;
+        int frameWidth = width;
+        int frameHeight = height;
+        glfwGetFramebufferSize(window, &frameWidth, &frameHeight);
+        glViewport(0, 0, s * frameWidth, s * frameHeight);
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(0, 0, s * frameWidth, s * frameHeight);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glDisable(GL_SCISSOR_TEST);
 
         // Apply projection matrix
         P->pushMatrix();
-        camera->applyProjectionMatrix(P);
+        P->multMatrix(glm::ortho(-1.0, 1.0, -1.0, 1.0));
 
         // Apply view matrix
         MV->pushMatrix();
-        camera->applyViewMatrix(MV);
+        MV->rotate(M_PI / 2, 1.0f, 0.0f, 0.0f);
+        MV->scale(0.15f);
 
-        // Draw it
+        // Draw world with top down view
+        world->drawTopDown(P, MV, t);
 
         // Pop matrix stacks
         MV->popMatrix();

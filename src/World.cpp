@@ -78,7 +78,7 @@ World::World(std::string resDir) :
         std::shared_ptr<Material> material = std::make_shared<Material>(glm::vec3(0.0f),
                                                                         glm::vec3(0.8f),
                                                                         glm::vec3(0.0f),
-                                                                        10000);
+                                                                        100000);
 
         std::shared_ptr<Object> obj = std::make_shared<Object>(shapes[i % 2],
                                                                material,
@@ -88,6 +88,21 @@ World::World(std::string resDir) :
 
         hud.push_back(obj);
     }
+
+    // Set up the fulcrum
+    std::shared_ptr<Shape> camFulcrum = std::make_shared<Shape>();
+    camFulcrum->loadMesh(resDir + "fulcrum.obj");
+    camFulcrum->init();
+
+    std::shared_ptr<Material> fulcrumMat = std::make_shared<Material>(glm::vec3(0.0f),
+                                                                      glm::vec3(0.0f),
+                                                                      glm::vec3(0.0f),
+                                                                      100000);
+    fulcrum = std::make_shared<Object>(camFulcrum,
+                                       fulcrumMat,
+                                       glm::vec3(0.0f),
+                                       glm::vec3(0.0f),
+                                       glm::vec3(1.0f));
 }
 
 World::~World()
@@ -95,7 +110,6 @@ World::~World()
 
 void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, double t)
 {
-
     // Shader manager needs to bind first
     shaderManager->bind(P, MV);
 
@@ -133,7 +147,25 @@ void World::drawHUD(std::shared_ptr<MatrixStack> &P, double t)
     shaderManager->unbind();
 }
 
-void World::drawTopDown(double t)
+void World::drawTopDown(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, double t)
 {
+    // Shader manager needs to bind first
+    shaderManager->bind(P, MV);
 
+    shaderManager->draw(sun, MV);
+
+    // Go through each object and draw
+    for(std::shared_ptr<Object> obj : objs)
+    {
+        obj->setGrowth(0.1f * (float)std::sin(t));
+        shaderManager->draw(obj, MV, true);
+    }
+
+    shaderManager->draw(ground, MV);
+
+    shaderManager->draw(fulcrum, MV);
+
+
+    // Shader manager needs to unbind now
+    shaderManager->unbind();
 }

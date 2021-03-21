@@ -23,7 +23,7 @@ public:
 
     void draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, double t);
     void drawHUD(std::shared_ptr<MatrixStack>& P, double t);
-    void drawTopDown(double t);
+    void drawTopDown(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, double t);
 
 private:
     inline float getRandom() { return randDist(randEngine); }
@@ -31,12 +31,12 @@ private:
     std::uniform_real_distribution<float> randDist;
 
     std::vector<std::shared_ptr<Object>> objs;
+    std::vector<std::shared_ptr<Object>> hud;
     std::shared_ptr<Object> sun;
     std::shared_ptr<Object> ground;
+    std::shared_ptr<Object> fulcrum;
     std::shared_ptr<ShaderManager> shaderManager;
     std::shared_ptr<Light> sunLight;
-
-    std::vector<std::shared_ptr<Object>> hud;
 };
 
 #endif
