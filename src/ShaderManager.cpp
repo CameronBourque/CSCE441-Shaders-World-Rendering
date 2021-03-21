@@ -142,13 +142,13 @@ void ShaderManager::unbind()
     programs[programSelection]->unbind();
 }
 
-void ShaderManager::draw(std::shared_ptr<Object>& obj, std::shared_ptr<MatrixStack>& MV, double t, bool grounded)
+void ShaderManager::draw(std::shared_ptr<Object>& obj, std::shared_ptr<MatrixStack>& MV, bool grounded)
 {
     // Push the model view matrix
     MV->pushMatrix();
 
     // Apply object transformations
-    obj->transform(MV, t, grounded);
+    obj->transform(MV, grounded);
 
     // Add MV
     glUniformMatrix4fv(programs[programSelection]->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));

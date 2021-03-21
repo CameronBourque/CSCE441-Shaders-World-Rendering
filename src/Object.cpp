@@ -14,11 +14,8 @@ Object::Object(std::shared_ptr<Shape> _shape, std::shared_ptr<Material> _materia
 Object::~Object()
 {}
 
-void Object::transform(std::shared_ptr<MatrixStack> &MV, double t, bool grounded)
+void Object::transform(std::shared_ptr<MatrixStack> &MV, bool grounded)
 {
-    // Calculate scale offset
-    float growth = 0.1f * (float)std::sin(t);
-
     // Need to adjust for the object's min y value if it's grounded
     float minY = 0;
     if(grounded)
