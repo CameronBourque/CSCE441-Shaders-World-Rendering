@@ -75,15 +75,15 @@ World::World(std::string resDir) :
     for(int i = 0; i < 2; i++)
     {
         std::shared_ptr<Material> material = std::make_shared<Material>(glm::vec3(0.2f),
-                                                                        glm::vec3(0.8f),
                                                                         glm::vec3(1.0f),
-                                                                        100);
+                                                                        glm::vec3(0.3f),
+                                                                        10000);
 
         std::shared_ptr<Object> obj = std::make_shared<Object>(shapes[i % 2],
                                                                material,
-                                                               glm::vec3(0.0f),
-                                                               glm::vec3(0.0f),
-                                                               glm::vec3(1.0f));
+                                                               glm::vec3(((i % 2) * 2 - 1) * 0.74f, 0.6f, 0.0f),
+                                                               glm::vec3(0.0f, 0.0f, 0.0f),
+                                                               glm::vec3(0.25f, 0.25f, 0.25f));
 
         hud.push_back(obj);
     }
@@ -112,19 +112,22 @@ void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& 
 
     // Shader manager needs to unbind now
     shaderManager->unbind();
+}
 
-    // Shader manager needs to rebind now to use another shader
-    shaderManager->changeProgram();
+void World::drawHUD(std::shared_ptr<MatrixStack> &P, double t)
+{
+    std::shared_ptr<MatrixStack> MV = std::make_shared<MatrixStack>();
+
+    // Shader manager needs to bind
     shaderManager->bind(P, MV);
 
     // Draw HUD with different shader
     for(std::shared_ptr<Object> obj : hud)
     {
         obj->setYAngle(t * M_PI / 6);
-        shaderManager->draw(obj, MV);
+        shaderManager->draw(obj, MV, true);
     }
 
-    // Shader manager need to unbind now
+    // Shader manager need to unbind
     shaderManager->unbind();
-    shaderManager->changeProgram(true);
 }

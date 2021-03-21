@@ -169,15 +169,20 @@ static void render()
     // Apply projection matrix
     P->pushMatrix();
     camera->applyProjectionMatrix(P);
-
     // Apply view matrix
     MV->pushMatrix();
     camera->applyViewMatrix(MV);
-
+    // Draw world
 	world->draw(P, MV, t);
-
     // Pop matrix stacks
     MV->popMatrix();
+    P->popMatrix();
+
+    // Apply projection matrix
+    P->pushMatrix();
+    // Draw HUD
+    world->drawHUD(P, t);
+    //Pop matrix stack
     P->popMatrix();
 
     // If top down viewport is activated

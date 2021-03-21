@@ -8,7 +8,8 @@ Object::Object(std::shared_ptr<Shape> _shape, std::shared_ptr<Material> _materia
                angles(_angles),
                scale(_scale),
                shear(_shear),
-               doShear(_doShear)
+               doShear(_doShear),
+               growth(0)
 {}
 
 Object::~Object()
