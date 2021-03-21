@@ -21,12 +21,11 @@ public:
     void transform(std::shared_ptr<MatrixStack>& MV, bool grounded);
 
     void setGrowth(float _growth) { growth = _growth; }
+    void setYAngle(float angle) { angles.y = angle; }
 
     std::shared_ptr<Material> getMaterial() { return material; }
     std::shared_ptr<Shape> getShape() { return shape; }
     glm::vec3 getTranslation() { return translation; }
-    glm::vec3 getAngles() { return angles; }
-    glm::vec3 getScale() { return scale; }
 
 private:
     std::shared_ptr<Shape> shape;

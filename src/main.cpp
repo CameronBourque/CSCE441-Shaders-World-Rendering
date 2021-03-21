@@ -76,6 +76,8 @@ static void cursor_position_callback(GLFWwindow* window, double xmouse, double y
 
 static void char_callback(GLFWwindow *window, unsigned int key)
 {
+    keyToggles[key] = !keyToggles[key];
+
     switch ((char)key)
     {
         case 'w':
@@ -95,9 +97,6 @@ static void char_callback(GLFWwindow *window, unsigned int key)
             break;
         case 'Z':
             camera->zoom();
-            break;
-        case 't':
-            // TODO: toggle viewport
             break;
         default:
             break;
@@ -156,16 +155,6 @@ static void render()
 {
 	// Clear framebuffer.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	if(keyToggles[(unsigned)'c']) {
-		glEnable(GL_CULL_FACE);
-	} else {
-		glDisable(GL_CULL_FACE);
-	}
-	if(keyToggles[(unsigned)'z']) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	} else {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
 	
 	// Get current frame buffer size.
 	int width, height;
@@ -190,6 +179,25 @@ static void render()
     // Pop matrix stacks
     MV->popMatrix();
     P->popMatrix();
+
+    // If top down viewport is activated
+    if(keyToggles[(unsigned)'t'])
+    {
+        // TODO: FIX
+        // Apply projection matrix
+        P->pushMatrix();
+        camera->applyProjectionMatrix(P);
+
+        // Apply view matrix
+        MV->pushMatrix();
+        camera->applyViewMatrix(MV);
+
+        // Draw it
+
+        // Pop matrix stacks
+        MV->popMatrix();
+        P->popMatrix();
+    }
 
 	GLSL::checkError(GET_FILE_LINE);
 	

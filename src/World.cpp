@@ -70,6 +70,23 @@ World::World(std::string resDir) :
                                       glm::vec3(0, 0, 0),
                                       glm::vec3(M_PI / 2, 0, 0),
                                       glm::vec3(100, 1, 100));
+
+    // Set up the HUD
+    for(int i = 0; i < 2; i++)
+    {
+        std::shared_ptr<Material> material = std::make_shared<Material>(glm::vec3(0.2f),
+                                                                        glm::vec3(0.8f),
+                                                                        glm::vec3(1.0f),
+                                                                        100);
+
+        std::shared_ptr<Object> obj = std::make_shared<Object>(shapes[i % 2],
+                                                               material,
+                                                               glm::vec3(0.0f),
+                                                               glm::vec3(0.0f),
+                                                               glm::vec3(1.0f));
+
+        hud.push_back(obj);
+    }
 }
 
 World::~World()
@@ -92,6 +109,22 @@ void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& 
 
     shaderManager->draw(ground, MV);
 
+
     // Shader manager needs to unbind now
     shaderManager->unbind();
+
+    // Shader manager needs to rebind now to use another shader
+    shaderManager->changeProgram();
+    shaderManager->bind(P, MV);
+
+    // Draw HUD with different shader
+    for(std::shared_ptr<Object> obj : hud)
+    {
+        obj->setYAngle(t * M_PI / 6);
+        shaderManager->draw(obj, MV);
+    }
+
+    // Shader manager need to unbind now
+    shaderManager->unbind();
+    shaderManager->changeProgram(true);
 }

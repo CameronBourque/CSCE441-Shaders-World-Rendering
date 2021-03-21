@@ -6,6 +6,9 @@
 #include <string>
 #include <random>
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "Object.h"
 #include "ShaderManager.h"
 #include "Light.h"
@@ -30,6 +33,8 @@ private:
     std::shared_ptr<Object> ground;
     std::shared_ptr<ShaderManager> shaderManager;
     std::shared_ptr<Light> sunLight;
+
+    std::vector<std::shared_ptr<Object>> hud;
 };
 
 #endif
