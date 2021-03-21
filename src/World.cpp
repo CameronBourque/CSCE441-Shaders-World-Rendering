@@ -35,6 +35,7 @@ World::World(std::string resDir) :
                                                                glm::vec3((i % 10) - 4.5, 0, ((i / 10) % 10) - 4.5),
                                                                glm::vec3(0.0, getRandom() * 2 * M_PI, 0.0),
                                                                glm::vec3(0.25, 0.25, 0.25));
+        obj->setGrowthLimiter(getRandom() * 0.75 + 0.125);
         objs.push_back(obj);
     }
 
@@ -74,9 +75,9 @@ World::World(std::string resDir) :
     // Set up the HUD
     for(int i = 0; i < 2; i++)
     {
-        std::shared_ptr<Material> material = std::make_shared<Material>(glm::vec3(0.2f),
-                                                                        glm::vec3(1.0f),
-                                                                        glm::vec3(0.3f),
+        std::shared_ptr<Material> material = std::make_shared<Material>(glm::vec3(0.0f),
+                                                                        glm::vec3(0.8f),
+                                                                        glm::vec3(0.0f),
                                                                         10000);
 
         std::shared_ptr<Object> obj = std::make_shared<Object>(shapes[i % 2],

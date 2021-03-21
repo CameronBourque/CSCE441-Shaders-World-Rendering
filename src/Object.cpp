@@ -9,7 +9,8 @@ Object::Object(std::shared_ptr<Shape> _shape, std::shared_ptr<Material> _materia
                scale(_scale),
                shear(_shear),
                doShear(_doShear),
-               growth(0)
+               growth(0.0f),
+               growthLimiter(1.0f)
 {}
 
 Object::~Object()
@@ -30,12 +31,12 @@ void Object::transform(std::shared_ptr<MatrixStack> &MV, bool grounded)
     }
 
     // Transform the shape
-    MV->translate(glm::vec3(translation.x, translation.y - (minY * (scale.y + growth)), translation.z));
+    MV->translate(glm::vec3(translation.x, translation.y - (minY * (scale.y + (growth * growthLimiter))), translation.z));
     if(doShear)
     {
         MV->multMatrix(shear);
     }
-    MV->scale(scale + growth);
+    MV->scale(scale + (growth * growthLimiter));
     MV->rotate(angles.x, 1, 0, 0);
     MV->rotate(angles.y, 0, 1, 0);
     MV->rotate(angles.z, 0, 0, 1);

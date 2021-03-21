@@ -21,6 +21,7 @@ public:
     void transform(std::shared_ptr<MatrixStack>& MV, bool grounded);
 
     void setGrowth(float _growth) { growth = _growth; }
+    void setGrowthLimiter(float _growthLimiter) { growthLimiter = _growthLimiter; }
     void setYAngle(float angle) { angles.y = angle; }
 
     std::shared_ptr<Material> getMaterial() { return material; }
@@ -37,6 +38,7 @@ private:
     bool doShear;
 
     float growth;
+    float growthLimiter;
 };
 
 #endif
