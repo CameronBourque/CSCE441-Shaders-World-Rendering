@@ -178,6 +178,8 @@ static void render()
     MV->popMatrix();
     P->popMatrix();
 
+    // Clear depth buffer so HUD is on top
+    glClear(GL_DEPTH_BUFFER_BIT);
     // Apply projection matrix
     P->pushMatrix();
     // Draw HUD
@@ -189,6 +191,7 @@ static void render()
     if(keyToggles[(unsigned)'t'])
     {
         // TODO: FIX
+
         // Apply projection matrix
         P->pushMatrix();
         camera->applyProjectionMatrix(P);

@@ -132,3 +132,8 @@ void World::drawHUD(std::shared_ptr<MatrixStack> &P, double t)
     // Shader manager need to unbind
     shaderManager->unbind();
 }
+
+void World::drawTopDown(double t)
+{
+
+}
