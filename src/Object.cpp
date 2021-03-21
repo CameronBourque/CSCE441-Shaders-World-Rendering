@@ -1,5 +1,4 @@
 #include "Object.h"
-#include <iostream>
 
 Object::Object(std::shared_ptr<Shape> _shape, std::shared_ptr<Material> _material, glm::vec3 _translation,
                glm::vec3 _angles, glm::vec3 _scale, glm::mat4 _shear, bool _doShear) :
