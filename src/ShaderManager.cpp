@@ -2,7 +2,6 @@
 
 ShaderManager::ShaderManager(std::string resDir) :
     programSelection(0),
-    materialSelection(0),
     lightSelection(0)
 {
     // Set up normal shader
@@ -68,40 +67,6 @@ ShaderManager::ShaderManager(std::string resDir) :
     cel->addUniform("s");
     cel->setVerbose(false);
     programs.push_back(cel);
-
-    // Set up materials
-    std::shared_ptr<Material> pinkish = std::make_shared<Material>(glm::vec3(0.2f, 0.2f, 0.2f),  // Ka
-                                                                   glm::vec3(0.8f, 0.7f, 0.7f),  // Kd
-                                                                   glm::vec3(1.0f, 0.9f, 0.8f),  // Ks
-                                                                   200                      // s
-    );
-    materials.push_back(pinkish);
-
-    std::shared_ptr<Material> blueGreen = std::make_shared<Material>(glm::vec3(0.0f, 0.0f, 0.4f),  // Ka
-                                                                     glm::vec3(0.0f, 0.0f, 0.6f),  // Kd
-                                                                     glm::vec3(0.0f, 1.0f, 0.0f),  // Ks
-                                                                     100                      // s
-    );
-    materials.push_back(blueGreen);
-
-
-    std::shared_ptr<Material> grayish = std::make_shared<Material>(glm::vec3(0.1f, 0.1f, 0.1f),  // Ka
-                                                                   glm::vec3(0.5f, 0.5f, 0.6f),  // Kd
-                                                                   glm::vec3(0.1f, 0.1f, 0.1f),  // Ks
-                                                                   10                       // s
-    );
-    materials.push_back(grayish);
-
-    // Set up lights
-    std::shared_ptr<Light> l1 = std::make_shared<Light>(glm::vec3(0.8, 0.8, 0.8), // color
-                                                        glm::vec3(1.0, 1.0, 1.0) // light position
-    );
-    lights.push_back(l1);
-
-    std::shared_ptr<Light> l2 = std::make_shared<Light>(glm::vec3(0.2, 0.2, 0.0), // color
-                                                        glm::vec3(-1.0, 1.0, 1.0) // light position
-    );
-    lights.push_back(l2);
 }
 
 ShaderManager::~ShaderManager()
@@ -113,7 +78,7 @@ void ShaderManager::changeProgram(bool decrement)
     if(!decrement)
     {
         // Check if need to go to start index
-        if(++programSelection == programs.size())
+        if(++programSelection >= programs.size())
         {
             programSelection = 0;
         }
@@ -121,30 +86,9 @@ void ShaderManager::changeProgram(bool decrement)
     else
     {
         // Check if need to go to end index
-        if(programSelection-- == 0)
+        if(programSelection-- <= 0)
         {
             programSelection = programs.size() - 1;
-        }
-    }
-}
-
-void ShaderManager::changeMaterial(bool decrement)
-{
-    // Are we incrementing or decrementing?
-    if(!decrement)
-    {
-        // Check if need to go to start index
-        if(++materialSelection == materials.size())
-        {
-            materialSelection = 0;
-        }
-    }
-    else
-    {
-        // Check if need to go to end index
-        if(materialSelection-- == 0)
-        {
-            materialSelection = materials.size() - 1;
         }
     }
 }
@@ -155,7 +99,7 @@ void ShaderManager::changeLight(bool decrement)
     if(!decrement)
     {
         // Check if need to go to start index
-        if(++lightSelection == lights.size())
+        if(++lightSelection >= lights.size())
         {
             lightSelection = 0;
         }
@@ -163,40 +107,34 @@ void ShaderManager::changeLight(bool decrement)
     else
     {
         // Check if need to go to end index
-        if(lightSelection-- == 0)
+        if(lightSelection-- <= 0)
         {
             lightSelection = lights.size() - 1;
         }
     }
 }
 
-void ShaderManager::bind(std::shared_ptr<MatrixStack>& P)
+void ShaderManager::addLight(std::shared_ptr<Light> light)
+{
+    lights.push_back(light);
+}
+
+void ShaderManager::bind(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV)
 {
     // Bind and then set the perspective uniform matrix
     programs[programSelection]->bind();
     glUniformMatrix4fv(programs[programSelection]->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
 
-    // If using Blinn Phong or Cel shader need to set more uniforms
+    // If using Blinn Phong or Cel shader need to set lighting
     if(programSelection == 1 || programSelection == 3)
     {
-        glm::vec3 lightPos[2];
-        glm::vec3 lightColor[2];
-        for(int i = 0; i < 2; i++)
-        {
-            lightPos[i] = lights[i]->getPosition();
-            lightColor[i] = lights[i]->getColor();
-        }
-        glUniform3fv(programs[programSelection]->getUniform("lightPos"), 2, glm::value_ptr(lightPos[0]));
-        glUniform3fv(programs[programSelection]->getUniform("lightColor"), 2, glm::value_ptr(lightColor[0]));
-
-        glm::vec3 ka = materials[materialSelection]->getKA();
-        glUniform3f(programs[programSelection]->getUniform("ka"), ka.x, ka.y, ka.z);
-        glm::vec3 kd = materials[materialSelection]->getKD();
-        glUniform3f(programs[programSelection]->getUniform("kd"), kd.x, kd.y, kd.z);
-        glm::vec3 ks = materials[materialSelection]->getKS();
-        glUniform3f(programs[programSelection]->getUniform("ks"), ks.x, ks.y, ks.z);
-        glUniform1f(programs[programSelection]->getUniform("s"), materials[materialSelection]->getS());
+        // Set lighting position
+        glm::vec4 lightPos = glm::vec4(lights[lightSelection]->getPosition(), 0);
+        // Convert from world space to camera space
+        lightPos = glm::transpose(glm::inverse(MV->topMatrix())) * lightPos;
+        glUniform3f(programs[programSelection]->getUniform("lightPos"), lightPos.x, lightPos.y, lightPos.z);
     }
+
 }
 
 void ShaderManager::unbind()
@@ -204,8 +142,14 @@ void ShaderManager::unbind()
     programs[programSelection]->unbind();
 }
 
-void ShaderManager::draw(std::shared_ptr<Shape>& bunny, std::shared_ptr<MatrixStack>& MV)
+void ShaderManager::draw(std::shared_ptr<Object>& obj, std::shared_ptr<MatrixStack>& MV, bool grounded)
 {
+    // Push the model view matrix
+    MV->pushMatrix();
+
+    // Apply object transformations
+    obj->transform(MV, grounded);
+
     // Add MV
     glUniformMatrix4fv(programs[programSelection]->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
 
@@ -216,5 +160,25 @@ void ShaderManager::draw(std::shared_ptr<Shape>& bunny, std::shared_ptr<MatrixSt
                            glm::value_ptr(glm::transpose(glm::inverse(MV->topMatrix()))));
     }
 
-    bunny->draw(programs[programSelection]);
+    // If using Blinn Phong or Cel shader need to set more uniforms
+    if(programSelection == 1 || programSelection == 3)
+    {
+        // Set lighting color
+        glm::vec3 lightColor = lights[lightSelection]->getColor();
+        glUniform3f(programs[programSelection]->getUniform("lightColor"), lightColor.r, lightColor.g, lightColor.b);
+
+        // Set material
+        glm::vec3 ka = obj->getMaterial()->getKA();
+        glUniform3f(programs[programSelection]->getUniform("ka"), ka.r, ka.g, ka.b);
+        glm::vec3 kd = obj->getMaterial()->getKD();
+        glUniform3f(programs[programSelection]->getUniform("kd"), kd.r, kd.g, kd.b);
+        glm::vec3 ks = obj->getMaterial()->getKS();
+        glUniform3f(programs[programSelection]->getUniform("ks"), ks.r, ks.g, ks.b);
+        glUniform1f(programs[programSelection]->getUniform("s"), obj->getMaterial()->getS());
+    }
+
+    obj->getShape()->draw(programs[programSelection]);
+
+    // Pop the model view matrix
+    MV->popMatrix();
 }

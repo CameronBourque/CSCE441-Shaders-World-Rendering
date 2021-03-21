@@ -14,6 +14,7 @@
 #include "MatrixStack.h"
 #include "Shape.h"
 #include "Light.h"
+#include "Object.h"
 
 class ShaderManager
 {
@@ -22,22 +23,17 @@ public:
     ~ShaderManager();
 
     void changeProgram(bool decrement = false);
-    void changeMaterial(bool decrement = false);
     void changeLight(bool decrement = false);
 
-    void bind(std::shared_ptr<MatrixStack>& P);
-    void unbind();
-    void draw(std::shared_ptr<Shape>& shape, std::shared_ptr<MatrixStack>& MV);
+    void addLight(std::shared_ptr<Light> light);
 
-    void moveLightX(bool decrement = false) { lights[lightSelection]->moveXPos(decrement); }
-    void moveLightY(bool decrement = false) { lights[lightSelection]->moveYPos(decrement); }
+    void bind(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV);
+    void unbind();
+    void draw(std::shared_ptr<Object>& shape, std::shared_ptr<MatrixStack>& MV, bool grounded = false);
 
 private:
     std::vector<std::shared_ptr<Program>> programs;
     unsigned int programSelection;
-
-    std::vector<std::shared_ptr<Material>> materials;
-    unsigned int materialSelection;
 
     std::vector<std::shared_ptr<Light>> lights;
     unsigned int lightSelection;

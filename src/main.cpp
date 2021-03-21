@@ -21,6 +21,7 @@
 #include "Program.h"
 #include "Shape.h"
 #include "ShaderManager.h"
+#include "World.h"
 
 using namespace std;
 
@@ -29,9 +30,7 @@ string RESOURCE_DIR = "./"; // Where the resources are loaded from
 bool OFFLINE = false;
 
 shared_ptr<Camera> camera;
-shared_ptr<Shape> bunny;
-shared_ptr<Shape> teapot;
-shared_ptr<ShaderManager> shader_manager;
+shared_ptr<World> world;
 
 bool keyToggles[256] = {false}; // only for English keyboards!
 
@@ -81,40 +80,14 @@ static void char_callback(GLFWwindow *window, unsigned int key)
 
     switch ((char)key)
     {
-        // Change the shader
+        case 'w':
+            break;
+        case 'a':
+            break;
         case 's':
-            shader_manager->changeProgram();
             break;
-        case 'S':
-            shader_manager->changeProgram(true);
+        case 'd':
             break;
-        // Change the material
-        case 'm':
-            shader_manager->changeMaterial();
-            break;
-        case 'M':
-            shader_manager->changeMaterial(true);
-            break;
-        // Change the light
-        case 'l':
-            shader_manager->changeLight();
-            break;
-        case 'L':
-            shader_manager->changeLight(true);
-            break;
-        // Change the position
-        case 'x':
-            shader_manager->moveLightX();
-            break;
-        case 'X':
-            shader_manager->moveLightX(true);
-            break;
-        case 'y':
-            shader_manager->moveLightY();
-            break;
-        case 'Y':
-            shader_manager->moveLightY(true);
-        // Do nothing
         default:
             break;
     }
@@ -158,19 +131,11 @@ static void init()
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	// Enable z-buffer test.
 	glEnable(GL_DEPTH_TEST);
-
-	shader_manager = make_shared<ShaderManager>(RESOURCE_DIR);
 	
 	camera = make_shared<Camera>();
 	camera->setInitDistance(2.0f); // Camera's initial Z translation
-	
-	bunny = make_shared<Shape>();
-	bunny->loadMesh(RESOURCE_DIR + "bunny.obj");
-	bunny->init();
 
-	teapot = make_shared<Shape>();
-	teapot->loadMesh(RESOURCE_DIR + "teapot.obj");
-	teapot->init();
+    world = make_shared<World>(RESOURCE_DIR);
 	
 	GLSL::checkError(GET_FILE_LINE);
 }
@@ -201,40 +166,9 @@ static void render()
 		// Spacebar turns animation on/off
 		t = 0.0f;
 	}
-	
-	// Matrix stacks
-	auto P = make_shared<MatrixStack>();
-	auto MV = make_shared<MatrixStack>();
-	
-	// Apply camera transforms
-	P->pushMatrix();
-	camera->applyProjectionMatrix(P);
-	MV->pushMatrix();
-	camera->applyViewMatrix(MV);
 
-	shader_manager->bind(P);
+	world->draw(camera, t);
 
-	// Transform the shapes
-	MV->pushMatrix();   // Bunny
-    MV->translate(-0.5f, -0.5f, 0.0f);
-    MV->scale(0.5f, 0.5f, 0.5f);
-    MV->rotate(t, 0.0f, 1.0f, 0.0f);
-	shader_manager->draw(bunny, MV);
-	MV->popMatrix();
-	MV->pushMatrix();   // Teapot
-    MV->translate(0.5f, 0.0f, 0.0f);
-    glm::mat4 S(1.0f);
-    S[0][1] = 0.5f*cos(t);
-    MV->multMatrix(S);
-	MV->scale(0.5f, 0.5f, 0.5f);
-	MV->rotate(M_PI, 0.0f, 1.0f, 0.0f);
-	shader_manager->draw(teapot, MV);
-	MV->popMatrix();
-	shader_manager->unbind();
-	
-	MV->popMatrix();
-	P->popMatrix();
-	
 	GLSL::checkError(GET_FILE_LINE);
 	
 	if(OFFLINE) {
