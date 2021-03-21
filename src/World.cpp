@@ -90,16 +90,16 @@ World::World(std::string resDir) :
     }
 
     // Set up the fulcrum
-    std::shared_ptr<Shape> camFulcrum = std::make_shared<Shape>();
-    camFulcrum->loadMesh(resDir + "fulcrum.obj");
-    camFulcrum->init();
+    std::shared_ptr<Shape> camFrustum = std::make_shared<Shape>();
+    camFrustum->loadMesh(resDir + "frustum.obj");
+    camFrustum->init();
 
-    std::shared_ptr<Material> fulcrumMat = std::make_shared<Material>(glm::vec3(0.0f),
+    std::shared_ptr<Material> frustumMat = std::make_shared<Material>(glm::vec3(0.0f),
                                                                       glm::vec3(0.0f),
                                                                       glm::vec3(0.0f),
                                                                       100000);
-    fulcrum = std::make_shared<Object>(camFulcrum,
-                                       fulcrumMat,
+    frustum = std::make_shared<Object>(camFrustum,
+                                       frustumMat,
                                        glm::vec3(0.0f),
                                        glm::vec3(0.0f),
                                        glm::vec3(1.0f));
@@ -163,7 +163,7 @@ void World::drawTopDown(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixS
 
     shaderManager->draw(ground, MV);
 
-    shaderManager->draw(fulcrum, MV);
+    shaderManager->draw(frustum, MV);
 
 
     // Shader manager needs to unbind now

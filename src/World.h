@@ -34,7 +34,7 @@ private:
     std::vector<std::shared_ptr<Object>> hud;
     std::shared_ptr<Object> sun;
     std::shared_ptr<Object> ground;
-    std::shared_ptr<Object> fulcrum;
+    std::shared_ptr<Object> frustum;
     std::shared_ptr<ShaderManager> shaderManager;
     std::shared_ptr<Light> sunLight;
 };
