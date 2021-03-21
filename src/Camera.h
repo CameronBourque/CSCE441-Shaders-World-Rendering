@@ -34,8 +34,7 @@ public:
 	void applyViewMatrix(std::shared_ptr<MatrixStack> MV) const;
 
 	float getAspect() { return aspect; }
-	float getZNear() { return znear; }
-	float getZFar() { return zfar; }
+	float getFOV() { return fovy; }
 	
 private:
 	float aspect;

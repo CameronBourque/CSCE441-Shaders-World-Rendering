@@ -122,8 +122,8 @@ void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& 
         shaderManager->draw(obj, MV, true);
     }
 
+    // Draw the ground
     shaderManager->draw(ground, MV);
-
 
     // Shader manager needs to unbind now
     shaderManager->unbind();
@@ -147,7 +147,8 @@ void World::drawHUD(std::shared_ptr<MatrixStack> &P, double t)
     shaderManager->unbind();
 }
 
-void World::drawTopDown(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, double t)
+void World::drawTopDown(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, glm::mat4 camMatrix,
+                        double t, float a, float fov)
 {
     // Shader manager needs to bind first
     shaderManager->bind(P, MV);
@@ -161,10 +162,17 @@ void World::drawTopDown(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixS
         shaderManager->draw(obj, MV, true);
     }
 
+    // Draw the ground
     shaderManager->draw(ground, MV);
 
+    // Draw the frustum
+    MV->pushMatrix();
+    glDisable(GL_DEPTH_TEST);
+    MV->multMatrix(glm::inverse(camMatrix));
+    MV->scale(a * std::tan(fov / 2.0f), std::tan(fov / 2.0f), 1.0f);
     shaderManager->draw(frustum, MV);
-
+    glEnable(GL_DEPTH_TEST);
+    MV->popMatrix();
 
     // Shader manager needs to unbind now
     shaderManager->unbind();

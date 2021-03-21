@@ -23,7 +23,8 @@ public:
 
     void draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, double t);
     void drawHUD(std::shared_ptr<MatrixStack>& P, double t);
-    void drawTopDown(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, double t);
+    void drawTopDown(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, glm::mat4 camMatrix, double t,
+                     float a, float fov);
 
 private:
     inline float getRandom() { return randDist(randEngine); }

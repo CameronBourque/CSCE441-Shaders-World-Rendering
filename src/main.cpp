@@ -177,6 +177,8 @@ static void render()
     camera->applyViewMatrix(MV);
     // Draw world
 	world->draw(P, MV, t);
+	// Get the camera matrix
+	glm::mat4 camMatrix = MV->topMatrix();
     // Pop matrix stacks
     MV->popMatrix();
     P->popMatrix();
@@ -214,7 +216,7 @@ static void render()
         MV->scale(0.15f);
 
         // Draw world with top down view
-        world->drawTopDown(P, MV, t);
+        world->drawTopDown(P, MV, camMatrix, t, camera->getAspect(), camera->getFOV());
 
         // Pop matrix stacks
         MV->popMatrix();
