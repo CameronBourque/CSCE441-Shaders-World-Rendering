@@ -75,18 +75,8 @@ World::World(std::string resDir) :
 World::~World()
 {}
 
-void World::draw(std::shared_ptr<Camera> camera, double t)
+void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, double t)
 {
-    std::shared_ptr<MatrixStack> P = std::make_shared<MatrixStack>();
-    std::shared_ptr<MatrixStack> MV = std::make_shared<MatrixStack>();
-
-    // Apply projection matrix
-    P->pushMatrix();
-    camera->applyProjectionMatrix(P);
-
-    // Apply view matrix
-    MV->pushMatrix();
-    camera->applyViewMatrix(MV);
 
     // Shader manager needs to bind first
     shaderManager->bind(P, MV);
@@ -103,8 +93,4 @@ void World::draw(std::shared_ptr<Camera> camera, double t)
 
     // Shader manager needs to unbind now
     shaderManager->unbind();
-
-    // Pop matrix stacks
-    MV->popMatrix();
-    P->popMatrix();
 }

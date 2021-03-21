@@ -27,6 +27,9 @@ public:
 	void setScaleFactor(float f) { sfactor = f; };
 	void mouseClicked(float x, float y, bool shift, bool ctrl, bool alt);
 	void mouseMoved(float x, float y);
+	void walk(bool decrement = false);
+	void strafe(bool decrement = false);
+	void zoom(bool decrement = false);
 	void applyProjectionMatrix(std::shared_ptr<MatrixStack> P) const;
 	void applyViewMatrix(std::shared_ptr<MatrixStack> MV) const;
 	
@@ -42,6 +45,9 @@ private:
 	float rfactor;
 	float tfactor;
 	float sfactor;
+	glm::vec3 position;
+	float yaw;
+	float pitch;
 };
 
 #endif

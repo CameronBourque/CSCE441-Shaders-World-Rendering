@@ -76,17 +76,25 @@ static void cursor_position_callback(GLFWwindow* window, double xmouse, double y
 
 static void char_callback(GLFWwindow *window, unsigned int key)
 {
-	keyToggles[key] = !keyToggles[key];
-
     switch ((char)key)
     {
         case 'w':
+            camera->walk();
             break;
         case 'a':
+            camera->strafe(true);
             break;
         case 's':
+            camera->walk(true);
             break;
         case 'd':
+            camera->strafe();
+            break;
+        case 'z':
+            camera->zoom(true);
+            break;
+        case 'Z':
+            camera->zoom();
             break;
         default:
             break;
@@ -167,7 +175,22 @@ static void render()
 		t = 0.0f;
 	}
 
-	world->draw(camera, t);
+    std::shared_ptr<MatrixStack> P = std::make_shared<MatrixStack>();
+    std::shared_ptr<MatrixStack> MV = std::make_shared<MatrixStack>();
+
+    // Apply projection matrix
+    P->pushMatrix();
+    camera->applyProjectionMatrix(P);
+
+    // Apply view matrix
+    MV->pushMatrix();
+    camera->applyViewMatrix(MV);
+
+	world->draw(P, MV, t);
+
+    // Pop matrix stacks
+    MV->popMatrix();
+    P->popMatrix();
 
 	GLSL::checkError(GET_FILE_LINE);
 	

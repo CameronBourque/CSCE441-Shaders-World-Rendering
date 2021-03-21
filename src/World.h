@@ -18,7 +18,7 @@ public:
 
     ~World();
 
-    void draw(std::shared_ptr<Camera> camera, double t);
+    void draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, double t);
 
 private:
     inline float getRandom() { return randDist(randEngine); }
