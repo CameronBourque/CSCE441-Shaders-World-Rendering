@@ -29,7 +29,7 @@ public:
 
     void bind(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV);
     void unbind();
-    void draw(std::shared_ptr<Object>& shape, std::shared_ptr<MatrixStack>& MV, bool grounded = false);
+    void draw(std::shared_ptr<Object>& shape, std::shared_ptr<MatrixStack>& MV, double t = 0, bool grounded = false);
 
 private:
     std::vector<std::shared_ptr<Program>> programs;

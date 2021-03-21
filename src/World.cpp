@@ -86,7 +86,7 @@ void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& 
     // Go through each object and draw
     for(std::shared_ptr<Object> obj : objs)
     {
-        shaderManager->draw(obj, MV, true);
+        shaderManager->draw(obj, MV, t,true);
     }
 
     shaderManager->draw(ground, MV);

@@ -18,7 +18,7 @@ public:
            glm::vec3 _angles, glm::vec3 _scale, glm::mat4 _shear = glm::mat4(0), bool _doShear = false);
     ~Object();
 
-    void transform(std::shared_ptr<MatrixStack>& MV, bool grounded);
+    void transform(std::shared_ptr<MatrixStack>& MV, double t, bool grounded);
 
     std::shared_ptr<Material> getMaterial() { return material; }
     std::shared_ptr<Shape> getShape() { return shape; }

@@ -96,6 +96,9 @@ static void char_callback(GLFWwindow *window, unsigned int key)
         case 'Z':
             camera->zoom();
             break;
+        case 't':
+            // TODO: toggle viewport
+            break;
         default:
             break;
     }
@@ -170,10 +173,6 @@ static void render()
 	camera->setAspect((float)width/(float)height);
 	
 	double t = glfwGetTime();
-	if(!keyToggles[(unsigned)' ']) {
-		// Spacebar turns animation on/off
-		t = 0.0f;
-	}
 
     std::shared_ptr<MatrixStack> P = std::make_shared<MatrixStack>();
     std::shared_ptr<MatrixStack> MV = std::make_shared<MatrixStack>();
