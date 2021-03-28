@@ -1,5 +1,4 @@
 #include "TextureObject.h"
-#include <iostream>
 
 TextureObject::TextureObject(std::shared_ptr<Texture> _texture) :
     texture(_texture)
@@ -41,10 +40,6 @@ TextureObject::TextureObject(std::shared_ptr<Texture> _texture) :
     indBuf.push_back(2);
     indBuf.push_back(1);
     indCount = (int)indBuf.size();
-
-    for(float f : texBuf)
-        std::cout << f << " ";
-    std::cout << std::endl;
 
     // Generate buffer IDs
     GLuint temp[3];

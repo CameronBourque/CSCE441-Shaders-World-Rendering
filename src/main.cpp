@@ -20,7 +20,6 @@
 #include "MatrixStack.h"
 #include "Program.h"
 #include "Shape.h"
-#include "ShaderManager.h"
 #include "World.h"
 
 using namespace std;
