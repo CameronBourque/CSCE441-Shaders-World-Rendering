@@ -23,6 +23,7 @@ ShaderManager::ShaderManager(std::string resDir) :
     blinnPhong->init();
     blinnPhong->addAttribute("aPos");
     blinnPhong->addAttribute("aNor");
+    blinnPhong->addAttribute("aTex");
     blinnPhong->addUniform("ITMV");
     blinnPhong->addUniform("MV");
     blinnPhong->addUniform("P");
@@ -32,6 +33,7 @@ ShaderManager::ShaderManager(std::string resDir) :
     blinnPhong->addUniform("kd");
     blinnPhong->addUniform("ks");
     blinnPhong->addUniform("s");
+    blinnPhong->addUniform("texture");
     blinnPhong->setVerbose(false);
     programs.push_back(blinnPhong);
 

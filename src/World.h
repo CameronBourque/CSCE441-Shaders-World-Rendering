@@ -13,6 +13,9 @@
 #include "ShaderManager.h"
 #include "Light.h"
 #include "Camera.h"
+#include "Texture.h"
+#include "TextureObject.h"
+#include "Program.h"
 
 class World
 {
@@ -31,6 +34,8 @@ private:
     std::mt19937 randEngine;
     std::uniform_real_distribution<float> randDist;
 
+    std::shared_ptr<Program> textureProgram;
+    std::shared_ptr<TextureObject> texture;
     std::vector<std::shared_ptr<Object>> objs;
     std::vector<std::shared_ptr<Object>> hud;
     std::shared_ptr<Object> sun;

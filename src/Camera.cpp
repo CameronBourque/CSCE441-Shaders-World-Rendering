@@ -12,8 +12,8 @@ Camera::Camera() :
 	zfar(1000.0f),
 	rotations(0.0, 0.0),
 	translations(0.0f, 0.0f, -5.0f),
-	rfactor(0.01f),
-	tfactor(0.1f),
+	rfactor(0.02f),
+	tfactor(0.05f),
 	sfactor(0.005f),
 	position(0.0f, 0.2f, 0.0f),
 	yaw(0),
@@ -35,7 +35,7 @@ void Camera::mouseMoved(float x, float y)
 {
 	glm::vec2 mouseCurr(x, y);
 	glm::vec2 dv = mouseCurr - mousePrev;
-	yaw += rfactor * dv.x;
+	yaw -= rfactor * dv.x;
 	pitch += rfactor * dv.y;
 	if(pitch > M_PI / 3)
     {

@@ -22,6 +22,8 @@ public:
     ShaderManager(std::string resDir);
     ~ShaderManager();
 
+    std::shared_ptr<Program> getProgram() { return programs[programSelection]; }
+
     void changeProgram(bool decrement = false);
     void changeLight(bool decrement = false);
 

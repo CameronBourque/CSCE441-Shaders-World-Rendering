@@ -27,6 +27,7 @@ public:
     std::shared_ptr<Material> getMaterial() { return material; }
     std::shared_ptr<Shape> getShape() { return shape; }
     glm::vec3 getTranslation() { return translation; }
+    float getGrowthLimiter() { return growthLimiter; }
 
 private:
     std::shared_ptr<Shape> shape;

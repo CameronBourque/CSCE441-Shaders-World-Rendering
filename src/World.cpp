@@ -57,20 +57,24 @@ World::World(std::string resDir) :
                                                            sun->getTranslation());
     shaderManager->addLight(light);
 
-    // Set up the ground
-    std::shared_ptr<Shape> square = std::make_shared<Shape>();
-    square->loadMesh(resDir + "square.obj");
-    square->init();
-
-    std::shared_ptr<Material> groundMat = std::make_shared<Material>(glm::vec3(0.3, 0.5, 0.1),
-                                                                     glm::vec3(0.0, 0.0, 0.0),
-                                                                     glm::vec3(0.0, 0.0, 0.0),
-                                                                     100000);
-    ground = std::make_shared<Object>(square,
-                                      groundMat,
-                                      glm::vec3(0, 0, 0),
-                                      glm::vec3(M_PI / 2, 0, 0),
-                                      glm::vec3(100, 1, 100));
+    // Set up ground texture and its program
+    std::shared_ptr<Texture> tex = std::make_shared<Texture>();
+    tex->setFilename(resDir + "flowerfield.jpg");
+    tex->init();
+    tex->setUnit(0);
+    tex->setWrapModes(GL_REPEAT, GL_REPEAT);
+    texture = std::make_shared<TextureObject>(tex);
+    textureProgram = std::make_shared<Program>();
+    textureProgram->setShaderNames(resDir + "tex_vert.glsl", resDir + "tex_frag.glsl");
+    textureProgram->setVerbose(true);
+    textureProgram->init();
+    textureProgram->addAttribute("aPos");
+    textureProgram->addAttribute("aTex");
+    textureProgram->addUniform("MV");
+    textureProgram->addUniform("P");
+    textureProgram->addUniform("T");
+    textureProgram->addUniform("texture");
+    textureProgram->setVerbose(false);
 
     // Set up the HUD
     for(int i = 0; i < 2; i++)
@@ -110,6 +114,13 @@ World::~World()
 
 void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, double t)
 {
+    // Draw ground
+    textureProgram->bind();
+    texture->bind(textureProgram, P, MV);
+    texture->draw();
+    texture->unbind();
+    textureProgram->unbind();
+
     // Shader manager needs to bind first
     shaderManager->bind(P, MV);
 
@@ -118,12 +129,9 @@ void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& 
     // Go through each object and draw
     for(std::shared_ptr<Object> obj : objs)
     {
-        obj->setGrowth(0.1f * (float)std::sin(t));
+        obj->setGrowth(0.1f * (float)std::sin(t + obj->getGrowthLimiter()));
         shaderManager->draw(obj, MV, true);
     }
-
-    // Draw the ground
-    shaderManager->draw(ground, MV);
 
     // Shader manager needs to unbind now
     shaderManager->unbind();
@@ -150,6 +158,13 @@ void World::drawHUD(std::shared_ptr<MatrixStack> &P, double t)
 void World::drawTopDown(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, glm::mat4 camMatrix,
                         double t, float a, float fov)
 {
+    // Draw ground
+    textureProgram->bind();
+    texture->bind(textureProgram, P, MV);
+    texture->draw();
+    texture->unbind();
+    textureProgram->unbind();
+
     // Shader manager needs to bind first
     shaderManager->bind(P, MV);
 
@@ -161,9 +176,6 @@ void World::drawTopDown(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixS
         obj->setGrowth(0.1f * (float)std::sin(t));
         shaderManager->draw(obj, MV, true);
     }
-
-    // Draw the ground
-    shaderManager->draw(ground, MV);
 
     // Draw the frustum
     MV->pushMatrix();
