@@ -77,7 +77,7 @@ void Camera::strafe(bool decrement)
 
 void Camera::zoom(bool decrement)
 {
-    // TODO: implement
+    // Which way are we zooming
     if(decrement && fovy > 4 * M_PI / 180)
     {
         fovy -= sfactor;
