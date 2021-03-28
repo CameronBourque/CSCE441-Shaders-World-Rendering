@@ -6,7 +6,6 @@ World::World(std::string resDir) :
 {
     // Initialize the shader manager
     shaderManager = std::make_shared<ShaderManager>(resDir);
-    shaderManager->changeProgram(); // want to use Blinn Phong shading
 
     // Initialize object shapes
     std::shared_ptr<Shape> bunny = std::make_shared<Shape>();

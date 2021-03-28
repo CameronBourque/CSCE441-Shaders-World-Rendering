@@ -4,18 +4,6 @@ ShaderManager::ShaderManager(std::string resDir) :
     programSelection(0),
     lightSelection(0)
 {
-    // Set up normal shader
-    std::shared_ptr<Program> normal = std::make_shared<Program>();
-    normal->setShaderNames(resDir + "normal_vert.glsl", resDir + "normal_frag.glsl");
-    normal->setVerbose(true);
-    normal->init();
-    normal->addAttribute("aPos");
-    normal->addAttribute("aNor");
-    normal->addUniform("MV");
-    normal->addUniform("P");
-    normal->setVerbose(false);
-    programs.push_back(normal);
-
     // Set up blinn phong shader
     std::shared_ptr<Program> blinnPhong = std::make_shared<Program>();
     blinnPhong->setShaderNames(resDir + "blinn_phong_vert.glsl", resDir + "blinn_phong_frag.glsl");
@@ -36,39 +24,6 @@ ShaderManager::ShaderManager(std::string resDir) :
     blinnPhong->addUniform("texture");
     blinnPhong->setVerbose(false);
     programs.push_back(blinnPhong);
-
-    // Set up silhouette shader
-    std::shared_ptr<Program> silhouette = std::make_shared<Program>();
-    silhouette->setShaderNames(resDir + "silhouette_vert.glsl", resDir + "silhouette_frag.glsl");
-    silhouette->setVerbose(true);
-    silhouette->init();
-    silhouette->addAttribute("aPos");
-    silhouette->addAttribute("aNor");
-    silhouette->addUniform("ITMV");
-    silhouette->addUniform("MV");
-    silhouette->addUniform("P");
-    silhouette->setVerbose(false);
-    programs.push_back(silhouette);
-
-    // Set up cel shader
-
-    std::shared_ptr<Program> cel = std::make_shared<Program>();
-    cel->setShaderNames(resDir + "cel_vert.glsl", resDir + "cel_frag.glsl");
-    cel->setVerbose(true);
-    cel->init();
-    cel->addAttribute("aPos");
-    cel->addAttribute("aNor");
-    cel->addUniform("ITMV");
-    cel->addUniform("MV");
-    cel->addUniform("P");
-    cel->addUniform("lightPos");
-    cel->addUniform("lightColor");
-    cel->addUniform("ka");
-    cel->addUniform("kd");
-    cel->addUniform("ks");
-    cel->addUniform("s");
-    cel->setVerbose(false);
-    programs.push_back(cel);
 }
 
 ShaderManager::~ShaderManager()
@@ -128,7 +83,7 @@ void ShaderManager::bind(std::shared_ptr<MatrixStack>& P, std::shared_ptr<Matrix
     glUniformMatrix4fv(programs[programSelection]->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
 
     // If using Blinn Phong or Cel shader need to set lighting
-    if(programSelection == 1 || programSelection == 3)
+    if(programSelection == 0)
     {
         // Set lighting position
         glm::vec4 lightPos = glm::vec4(lights[lightSelection]->getPosition(), 0);
@@ -155,16 +110,13 @@ void ShaderManager::draw(std::shared_ptr<Object>& obj, std::shared_ptr<MatrixSta
     // Add MV
     glUniformMatrix4fv(programs[programSelection]->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
 
-    // If not using Normal shader need to use inverse transpose matrix
-    if(programSelection != 0)
+    // If using Blinn Phong or Cel shader need to set more uniforms
+    if(programSelection == 0)
     {
+        // Set inverse transpose matrix
         glUniformMatrix4fv(programs[programSelection]->getUniform("ITMV"), 1, GL_FALSE,
                            glm::value_ptr(glm::transpose(glm::inverse(MV->topMatrix()))));
-    }
 
-    // If using Blinn Phong or Cel shader need to set more uniforms
-    if(programSelection == 1 || programSelection == 3)
-    {
         // Set lighting color
         glm::vec3 lightColor = lights[lightSelection]->getColor();
         glUniform3f(programs[programSelection]->getUniform("lightColor"), lightColor.r, lightColor.g, lightColor.b);
