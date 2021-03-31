@@ -36,7 +36,7 @@ void Camera::mouseMoved(float x, float y)
 	glm::vec2 mouseCurr(x, y);
 	glm::vec2 dv = mouseCurr - mousePrev;
 	yaw -= rfactor * dv.x;
-	pitch += rfactor * dv.y;
+	pitch -= rfactor * dv.y;
 	if(pitch > M_PI / 3)
     {
 	    pitch = M_PI / 3;
@@ -97,6 +97,5 @@ void Camera::applyProjectionMatrix(std::shared_ptr<MatrixStack> P) const
 
 void Camera::applyViewMatrix(std::shared_ptr<MatrixStack> MV) const
 {
-    MV->rotate(pitch, glm::vec3(1.0f, 0.0f, 0.0f));
-    MV->multMatrix(glm::lookAt(position, position + glm::vec3(std::sin(yaw), 0.0f, std::cos(yaw)), glm::vec3(0.0, 1.0, 0.0)));
+    MV->multMatrix(glm::lookAt(position, position + glm::vec3(std::sin(yaw), pitch, std::cos(yaw)), glm::vec3(0.0, 1.0, 0.0)));
 }
