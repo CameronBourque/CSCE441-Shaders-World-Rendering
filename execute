@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROGRAM_NAME="A4"
+PROGRAM_NAME="A5"
 
 # Create the build folder or clean it
 if [ ! -d "./build" ]
