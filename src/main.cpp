@@ -244,7 +244,7 @@ static void render()
 int main(int argc, char **argv)
 {
 	if(argc < 2) {
-		cout << "Usage: A3 RESOURCE_DIR" << endl;
+		cout << "Usage: A4 RESOURCE_DIR" << endl;
 		return 0;
 	}
 	RESOURCE_DIR = argv[1] + string("/");
