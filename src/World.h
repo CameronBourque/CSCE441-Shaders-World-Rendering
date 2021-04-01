@@ -10,7 +10,6 @@
 #include <cmath>
 
 #include "Object.h"
-#include "Light.h"
 #include "Camera.h"
 #include "Program.h"
 
@@ -29,6 +28,7 @@ private:
     std::uniform_real_distribution<float> randDist;
 
     std::vector<std::shared_ptr<Object>> objs;
+    std::shared_ptr<Program> prog;
 };
 
 #endif
