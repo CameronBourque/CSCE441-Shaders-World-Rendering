@@ -9,6 +9,7 @@
 
 #include "Shape.h"
 #include "MatrixStack.h"
+#include "Program.h"
 
 class Object
 {
@@ -18,6 +19,7 @@ public:
            glm::vec3 _kd, glm::vec3 _ks, float _s);
     ~Object();
 
+    void bind(std::shared_ptr<Program>& prog) const;
     void transform(std::shared_ptr<MatrixStack>& MV, bool grounded);
 
     std::shared_ptr<Shape> getShape() { return shape; }
