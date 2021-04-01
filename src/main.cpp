@@ -79,24 +79,6 @@ static void char_callback(GLFWwindow *window, unsigned int key)
 
     switch ((char)key)
     {
-        case 'w':
-            camera->walk();
-            break;
-        case 'a':
-            camera->strafe(true);
-            break;
-        case 's':
-            camera->walk(true);
-            break;
-        case 'd':
-            camera->strafe();
-            break;
-        case 'z':
-            camera->zoom(true);
-            break;
-        case 'Z':
-            camera->zoom();
-            break;
         default:
             break;
     }
@@ -191,46 +173,6 @@ static void render()
     // Pop matrix stacks
     MV->popMatrix();
     P->popMatrix();
-
-    // Clear depth buffer so HUD is on top
-    glClear(GL_DEPTH_BUFFER_BIT);
-    // Apply projection matrix
-    P->pushMatrix();
-    // Draw HUD
-    world->drawHUD(P, t);
-    //Pop matrix stack
-    P->popMatrix();
-
-    // If top down viewport is activated
-    if(keyToggles[(unsigned)'t'])
-    {
-        // Set up region in bottom left to show this view
-        double s = 0.5;
-        int frameWidth = width;
-        int frameHeight = height;
-        glfwGetFramebufferSize(window, &frameWidth, &frameHeight);
-        glViewport(0, 0, s * frameWidth, s * frameHeight);
-        glEnable(GL_SCISSOR_TEST);
-        glScissor(0, 0, s * frameWidth, s * frameHeight);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glDisable(GL_SCISSOR_TEST);
-
-        // Apply projection matrix
-        P->pushMatrix();
-        P->multMatrix(glm::ortho(-1.0, 1.0, -1.0, 1.0));
-
-        // Apply view matrix
-        MV->pushMatrix();
-        MV->rotate(M_PI / 2, 1.0f, 0.0f, 0.0f);
-        MV->scale(0.15f);
-
-        // Draw world with top down view
-        world->drawTopDown(P, MV, camMatrix, t, camera->getAspect(), camera->getFOV());
-
-        // Pop matrix stacks
-        MV->popMatrix();
-        P->popMatrix();
-    }
 
 	GLSL::checkError(GET_FILE_LINE);
 	
