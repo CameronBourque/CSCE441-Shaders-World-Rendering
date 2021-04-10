@@ -119,8 +119,7 @@ static void init()
 	glfwSetTime(0.0);
 	
 	// Set background color.
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	// Enable z-buffer test.
 	glEnable(GL_DEPTH_TEST);
 	
@@ -185,7 +184,7 @@ static void render()
 int main(int argc, char **argv)
 {
 	if(argc < 2) {
-		cout << "Usage: A4 RESOURCE_DIR" << endl;
+		cout << "Usage: A5 RESOURCE_DIR" << endl;
 		return 0;
 	}
 	RESOURCE_DIR = argv[1] + string("/");
