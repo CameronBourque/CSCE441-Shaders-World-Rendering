@@ -12,37 +12,32 @@ varying vec3 cNor; // in camera space
 
 void main()
 {
+	// set some constants
 	float A0 = 1.0;
 	float A1 = 0.0429;
 	float A2 = 0.9857;
 
+	// get the normalized normals
 	vec3 n = normalize(cNor);
 
-	// get diffuse component
-	vec3 l[10];
-	vec3 cd[10];
-	for(int i = 0; i < 10; i++)
-	{
-		l[i] = normalize(lightPos[i] - p.xyz);
-		cd[i] = kd * max(dot(l[i], n), 0);
-	}
-
-	// get specular component
-	vec3 e = normalize(-p.xyz);
-	vec3 h[10];
-	vec3 cs[10];
-	for(int i = 0; i < 10; i++)
-	{
-		h[i] = normalize(l[i] + e);
-		cs[i] = ks * pow(max(dot(h[i], n), 0), s);
-	}
+	// start with ke for the color
+	vec3 fragColor = ke;
 
 	// get the color
-	vec3 fragColor = ke;
 	for(int i = 0; i < 10; i++)
 	{
 		float r = distance(lightPos[i], p.xyz);
-		vec3 color = lightColor[i] * (cd[i] + cs[i]);
+
+		// calculate the diffuse
+		vec3 l = normalize(lightPos[i] - p.xyz);
+		vec3 diffuse = kd * max(dot(l, n), 0);
+
+		// calculate the specular
+		vec3 e = normalize(-p.xyz);
+		vec3 h = normalize(l + e);
+		vec3 specular = ks * pow(max(dot(h, n), 0), s);
+
+		vec3 color = lightColor[i] * (diffuse + specular);
 		float attenuation = 1.0f / (A0 + (A1 * r) + (A2 * r * r));
 		fragColor += color * attenuation;
 	}

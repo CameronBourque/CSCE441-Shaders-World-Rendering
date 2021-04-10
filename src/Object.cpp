@@ -1,7 +1,7 @@
 #include "Object.h"
 
 Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale,
-               glm::vec3 _ke, float _s) :
+               glm::vec3 _ke) :
                shape(_shape),
                translation(_translation),
                angles(_angles),
@@ -9,12 +9,12 @@ Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3
                ke(_ke),
                kd(0.0f),
                ks(0.0f),
-               s(_s)
+               s(1.0f)
 {
 }
 
 Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale,
-               glm::vec3 _kd, glm::vec3 _ks, float _s) :
+               glm::vec3 _kd, glm::vec3 _ks) :
                shape(_shape),
                translation(_translation),
                angles(_angles),
@@ -22,7 +22,7 @@ Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3
                ke(0.0f),
                kd(_kd),
                ks(_ks),
-               s(_s)
+               s(10.0f)
 {
 }
 

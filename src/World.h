@@ -28,6 +28,9 @@ private:
     std::mt19937 randEngine;
     std::uniform_real_distribution<float> randDist;
 
+    void bindLights(std::shared_ptr<MatrixStack>& MV);
+
+    std::shared_ptr<Object> ground;
     std::vector<std::shared_ptr<Object>> objs;
     std::vector<std::shared_ptr<Light>> lights;
     std::shared_ptr<Program> prog;
