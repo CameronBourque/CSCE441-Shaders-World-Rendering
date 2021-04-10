@@ -12,6 +12,7 @@
 #include "Object.h"
 #include "Camera.h"
 #include "Program.h"
+#include "Light.h"
 
 class World
 {
@@ -28,6 +29,7 @@ private:
     std::uniform_real_distribution<float> randDist;
 
     std::vector<std::shared_ptr<Object>> objs;
+    std::vector<std::shared_ptr<Light>> lights;
     std::shared_ptr<Program> prog;
 };
 

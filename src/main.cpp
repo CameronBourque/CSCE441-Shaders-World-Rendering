@@ -120,6 +120,7 @@ static void init()
 	
 	// Set background color.
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	// Enable z-buffer test.
 	glEnable(GL_DEPTH_TEST);
 	
@@ -168,8 +169,6 @@ static void render()
     camera->applyViewMatrix(MV);
     // Draw world
 	world->draw(P, MV, t);
-	// Get the camera matrix
-	glm::mat4 camMatrix = MV->topMatrix();
     // Pop matrix stacks
     MV->popMatrix();
     P->popMatrix();

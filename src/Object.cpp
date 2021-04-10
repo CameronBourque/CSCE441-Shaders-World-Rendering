@@ -1,17 +1,30 @@
 #include "Object.h"
 
-Object::Object(std::shared_ptr<Shape> _shape, glm::vec3 _translation,
-               glm::vec3 _angles, glm::vec3 _scale, glm::vec3 _ka,
+Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale,
+               glm::vec3 _ke, float _s) :
+               shape(_shape),
+               translation(_translation),
+               angles(_angles),
+               scale(_scale),
+               ke(_ke),
+               kd(0.0f),
+               ks(0.0f),
+               s(_s)
+{
+}
+
+Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale,
                glm::vec3 _kd, glm::vec3 _ks, float _s) :
                shape(_shape),
                translation(_translation),
                angles(_angles),
                scale(_scale),
-               ka(_ka),
+               ke(0.0f),
                kd(_kd),
                ks(_ks),
                s(_s)
-{}
+{
+}
 
 Object::~Object()
 {}
@@ -29,9 +42,11 @@ void Object::transform(std::shared_ptr<MatrixStack>& MV, bool grounded)
             }
         }
     }
+    // Fix min y to scale of object
+    minY = minY * scale.y;
 
     // Transform the shape
-    MV->translate(glm::vec3(translation.x, translation.y - (minY * scale.y), translation.z));
+    MV->translate(glm::vec3(translation.x, translation.y - minY, translation.z));
     MV->scale(scale);
     MV->rotate(angles.x, 1, 0, 0);
     MV->rotate(angles.y, 0, 1, 0);
@@ -41,8 +56,15 @@ void Object::transform(std::shared_ptr<MatrixStack>& MV, bool grounded)
 void Object::bind(std::shared_ptr<Program>& prog) const
 {
     // This will set the color for the object
-    glUniform3f(prog->getUniform("ka"), ka.r, ka.g, ka.b);
+    glUniform3f(prog->getUniform("ke"), ke.r, ke.g, ke.b);
     glUniform3f(prog->getUniform("kd"), kd.r, kd.g, kd.b);
     glUniform3f(prog->getUniform("ks"), ks.r, ks.g, ks.b);
     glUniform1f(prog->getUniform("s"), s);
+}
+
+void Object::bindTransform(std::shared_ptr<Program> &prog, std::shared_ptr<MatrixStack> &MV)
+{
+    glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
+    glUniformMatrix4fv(prog->getUniform("ITMV"), 1, GL_FALSE,
+                       glm::value_ptr(glm::transpose(glm::inverse(MV->topMatrix()))));
 }
