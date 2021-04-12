@@ -13,6 +13,9 @@
 #include "Camera.h"
 #include "Program.h"
 #include "Light.h"
+#include "Bunny.h"
+#include "Teapot.h"
+#include "Ball.h"
 
 class World
 {

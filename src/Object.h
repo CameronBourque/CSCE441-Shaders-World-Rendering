@@ -18,23 +18,15 @@
 class Object
 {
 public:
-    enum ObjectShape {
-        BUNNY = 0,
-        TEAPOT,
-        BOUNCE_SPHERE,
-        SURFACE_OF_REVOLUTION,
-        OTHER
-    };
-
-    Object(std::shared_ptr<Shape>& _shape, glm::vec3 _translation,
-           glm::vec3 _angles, glm::vec3 _scale, glm::vec3 _ke);
-    Object(std::shared_ptr<Shape>& _shape, glm::vec3 _translation,
-           glm::vec3 _angles, glm::vec3 _scale, glm::vec3 _kd, glm::vec3 _ks,
-           ObjectShape _objectShape);
+    Object(std::shared_ptr<Shape>& _shape, glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale, glm::vec3 _ke);
+    Object(glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale, glm::vec3 _kd, glm::vec3 _ks);
+    Object(std::shared_ptr<Shape>& _shape, glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale, glm::vec3 _kd,
+           glm::vec3 _ks);
     ~Object();
 
-    virtual void bind(std::shared_ptr<Program>& prog) const;
     virtual void transform(std::shared_ptr<MatrixStack>& MV);
+    virtual void draw(std::shared_ptr<Program>& prog);
+    void bind(std::shared_ptr<Program>& prog) const;
     static void bindTransform(std::shared_ptr<Program>& prog, std::shared_ptr<MatrixStack>& MV);
 
     std::shared_ptr<Shape> getShape() { return shape; }
@@ -42,7 +34,6 @@ public:
 
 protected:
     std::shared_ptr<Shape> shape;
-    ObjectShape objectShape;
 
     glm::vec3 translation;
     glm::vec3 angles;

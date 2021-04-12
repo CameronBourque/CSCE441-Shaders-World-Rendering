@@ -22,17 +22,14 @@ World::World(std::string resDir) :
     prog->addUniform("s");
     prog->setVerbose(false);
 
-    std::vector<std::shared_ptr<Shape>> objectShapes;
-
+    int objectShapes = 2;
     std::shared_ptr<Shape> bunny = std::make_shared<Shape>();
     bunny->loadMesh(resDir + "bunny.obj");
     bunny->init();
-    objectShapes.push_back(bunny);
 
     std::shared_ptr<Shape> teapot = std::make_shared<Shape>();
     teapot->loadMesh(resDir + "teapot.obj");
     teapot->init();
-    objectShapes.push_back(teapot);
 
     std::shared_ptr<Shape> sphere = std::make_shared<Shape>();
     sphere->loadMesh(resDir + "sphere.obj");
@@ -48,28 +45,62 @@ World::World(std::string resDir) :
                                       glm::vec3(-M_PI / 2, 0.0, 0.0),
                                       glm::vec3(100.0, 1.0, 100.0),
                                       glm::vec3(0.5, 0.5, 0.5),
-                                      glm::vec3(1.0),
-                                      Object::ObjectShape::OTHER
+                                      glm::vec3(1.0)
     );
 
     // Set up world objects
     for(int i = 0; i < 100; i++)
     {
-        size_t shapeIndex = (i % objectShapes.size()) ^ ((i / 10) % objectShapes.size());
-        std::shared_ptr<Object> obj = std::make_shared<Object>(objectShapes[shapeIndex],
-                                                               glm::vec3((i % 10) - 4.5,
-                                                                                   0.0,
-                                                                                   ((i / 10) % 10) - 4.5
-                                                                                   ), // translation
-                                                               glm::vec3(0.0), // angles
-                                                               glm::vec3(0.25), // scale
-                                                               glm::vec3(getRandom(),
-                                                                             getRandom(),
-                                                                             getRandom()
-                                                                             ), //kd
-                                                               glm::vec3(1.0), // ks
-                                                               (Object::ObjectShape) shapeIndex
-        );
+        size_t shapeIndex = (i % objectShapes) ^ ((i / 10) % objectShapes);
+        std::shared_ptr<Object> obj;
+        switch (shapeIndex)
+        {
+            case 0:
+                obj = std::make_shared<Bunny>(bunny, // shape
+                                              glm::vec3((i % 10) - 4.5,
+                                                        0.0,
+                                                        ((i / 10) % 10) - 4.5
+                                              ), // translation
+                                              glm::vec3(0.0), // angles
+                                              glm::vec3(0.25), // scale
+                                              glm::vec3(getRandom(),
+                                                        getRandom(),
+                                                        getRandom()
+                                              ), //kd
+                                              glm::vec3(1.0) // ks
+                );
+                break;
+            case 1:
+                obj = std::make_shared<Teapot>(teapot, // shape
+                                               glm::vec3((i % 10) - 4.5,
+                                                         0.0,
+                                                         ((i / 10) % 10) - 4.5
+                                               ), // translation
+                                               glm::vec3(0.0), // angles
+                                               glm::vec3(0.25), // scale
+                                               glm::vec3(getRandom(),
+                                                         getRandom(),
+                                                         getRandom()
+                                               ), //kd
+                                               glm::vec3(1.0) // ks
+                );
+                break;
+            case 2:
+                obj = std::make_shared<Ball>(glm::vec3((i % 10) - 4.5,
+                                                       0.0,
+                                                       ((i / 10) % 10) - 4.5
+                                             ), // translation
+                                             glm::vec3(0.0), // angles
+                                             glm::vec3(0.25), // scale
+                                             glm::vec3(getRandom(),
+                                                       getRandom(),
+                                                       getRandom()
+                                             ), //kd
+                                             glm::vec3(1.0) // ks
+                );
+            case 3:
+                break;
+        }
         objs.push_back(obj);
     }
 
@@ -113,7 +144,7 @@ void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& 
         MV->pushMatrix();
         light->transform(MV);
         Object::bindTransform(prog, MV);
-        light->getShape()->draw(prog);
+        light->draw(prog);
         MV->popMatrix();
     }
 
@@ -124,7 +155,7 @@ void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& 
         MV->pushMatrix();
         obj->transform(MV);
         Object::bindTransform(prog, MV);
-        obj->getShape()->draw(prog);
+        obj->draw(prog);
         MV->popMatrix();
     }
 
@@ -133,7 +164,7 @@ void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& 
     MV->pushMatrix();
     ground->transform(MV);
     Object::bindTransform(prog, MV);
-    ground->getShape()->draw(prog);
+    ground->draw(prog);
     MV->popMatrix();
 
     // Unbind program
