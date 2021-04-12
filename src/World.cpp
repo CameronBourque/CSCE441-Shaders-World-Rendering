@@ -22,7 +22,7 @@ World::World(std::string resDir) :
     prog->addUniform("s");
     prog->setVerbose(false);
 
-    int objectShapes = 2;
+    int objectShapes = 3;
     std::shared_ptr<Shape> bunny = std::make_shared<Shape>();
     bunny->loadMesh(resDir + "bunny.obj");
     bunny->init();
@@ -30,6 +30,8 @@ World::World(std::string resDir) :
     std::shared_ptr<Shape> teapot = std::make_shared<Shape>();
     teapot->loadMesh(resDir + "teapot.obj");
     teapot->init();
+
+    std::shared_ptr<Shape> ball = std::make_shared<BallShape>();
 
     std::shared_ptr<Shape> sphere = std::make_shared<Shape>();
     sphere->loadMesh(resDir + "sphere.obj");
@@ -51,7 +53,7 @@ World::World(std::string resDir) :
     // Set up world objects
     for(int i = 0; i < 100; i++)
     {
-        size_t shapeIndex = (i % objectShapes) ^ ((i / 10) % objectShapes);
+        size_t shapeIndex = (i % objectShapes);
         std::shared_ptr<Object> obj;
         switch (shapeIndex)
         {
@@ -86,7 +88,8 @@ World::World(std::string resDir) :
                 );
                 break;
             case 2:
-                obj = std::make_shared<Ball>(glm::vec3((i % 10) - 4.5,
+                obj = std::make_shared<Ball>(ball, // shape
+                                             glm::vec3((i % 10) - 4.5,
                                                        0.0,
                                                        ((i / 10) % 10) - 4.5
                                              ), // translation
@@ -98,6 +101,7 @@ World::World(std::string resDir) :
                                              ), //kd
                                              glm::vec3(1.0) // ks
                 );
+                break;
             case 3:
                 break;
         }

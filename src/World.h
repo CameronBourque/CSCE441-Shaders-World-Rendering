@@ -16,6 +16,7 @@
 #include "Bunny.h"
 #include "Teapot.h"
 #include "Ball.h"
+#include "BallShape.h"
 
 class World
 {

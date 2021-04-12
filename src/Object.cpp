@@ -13,18 +13,6 @@ Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3
 {
 }
 
-Object::Object(glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale, glm::vec3 _kd, glm::vec3 _ks) :
-               translation(_translation),
-               angles(_angles),
-               scale(_scale),
-               ke(0.0f),
-               kd(_kd),
-               ks(_ks),
-               s(10.0f)
-{
-    shape = std::make_shared<Shape>();
-}
-
 Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale,
                glm::vec3 _kd, glm::vec3 _ks) :
                shape(_shape),

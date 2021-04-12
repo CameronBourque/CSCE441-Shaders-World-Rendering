@@ -23,11 +23,13 @@ public:
 	void loadMesh(const std::string &meshName);
 	void fitToUnitBox();
     void init();
-    void draw(const std::shared_ptr<Program> prog) const;
+    virtual void draw(std::shared_ptr<Program> prog);
+
+    void loadBall();
 
     std::vector<float>& getPosBuf() { return posBuf; }
 
-private:
+protected:
 	std::vector<float> posBuf;
 	std::vector<float> norBuf;
 	std::vector<float> texBuf;

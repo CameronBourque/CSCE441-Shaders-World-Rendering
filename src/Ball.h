@@ -5,18 +5,18 @@
 #include <cmath>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "Object.h"
 
 class Ball : public Object
 {
 public:
-    Ball(glm::vec3 translation, glm::vec3 angles, glm::vec3 scale, glm::vec3 kd, glm::vec3 ks);
+    Ball(std::shared_ptr<Shape> shape, glm::vec3 translation, glm::vec3 angles, glm::vec3 scale, glm::vec3 kd,
+         glm::vec3 ks);
     ~Ball();
 
-private:
-    std::map<std::string, GLuint> bufIDs;
-    int indCount;
+    void transform(std::shared_ptr<MatrixStack>& MV);
 };
 
 #endif
