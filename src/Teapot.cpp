@@ -13,12 +13,7 @@ Teapot::~Teapot()
 void Teapot::transform(std::shared_ptr<MatrixStack> &MV)
 {
     // Need to adjust for the object's min y value if it's grounded
-    float minY = shape->getPosBuf()[1];
-    for (size_t i = 1; i < shape->getPosBuf().size(); i += 3) {
-        if (shape->getPosBuf()[i] < minY) {
-            minY = shape->getPosBuf()[i];
-        }
-    }
+    float minY = shape->getMinYPos();
 
     // Fix min y to scale of object
     minY = minY * scale.y;

@@ -10,6 +10,8 @@ public:
           glm::vec3 angles, glm::vec3 scale, glm::vec3 ke);
     ~Light();
 
+    void transform(std::shared_ptr<MatrixStack>& MV);
+
     glm::vec3 getKE() { return ke; }
 };
 

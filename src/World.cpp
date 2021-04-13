@@ -33,10 +33,6 @@ World::World(std::string resDir) :
 
     std::shared_ptr<Shape> ball = std::make_shared<BallShape>();
 
-    std::shared_ptr<Shape> sphere = std::make_shared<Shape>();
-    sphere->loadMesh(resDir + "sphere.obj");
-    sphere->init();
-
     std::shared_ptr<Shape> square = std::make_shared<Shape>();
     square->loadMesh(resDir + "square.obj");
     square->init();
@@ -111,7 +107,7 @@ World::World(std::string resDir) :
     // Set up lights
     for(int i = 0; i < 10; i++)
     {
-        std::shared_ptr<Light> light = std::make_shared<Light>(sphere,
+        std::shared_ptr<Light> light = std::make_shared<Light>(ball,
                                                                glm::vec3((float)i - 4,
                                                                          0.1,
                                                                          (float)i - 4

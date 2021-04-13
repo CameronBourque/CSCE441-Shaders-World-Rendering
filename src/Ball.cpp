@@ -13,12 +13,7 @@ Ball::~Ball()
 void Ball::transform(std::shared_ptr<MatrixStack> &MV)
 {
     // Need to adjust for the object's min y value if it's grounded
-    float minY = shape->getPosBuf()[1];
-    for (size_t i = 1; i < shape->getPosBuf().size(); i += 3) {
-        if (shape->getPosBuf()[i] < minY) {
-            minY = shape->getPosBuf()[i];
-        }
-    }
+    float minY = shape->getMinYPos();
 
     // Fix min y to scale of object
     minY = minY * scale.y;
@@ -39,7 +34,7 @@ void Ball::transform(std::shared_ptr<MatrixStack> &MV)
     float half = 0.5f;
 
     // Calculate translation and scale
-    float y = yFactor * (half * sin(2 * M_PI / p * (t + to) + half));
+    float y = yFactor * (half * sin(2 * M_PI / p * (t + to) + half)) + yFactor * half;
     float s = -sFactor * (half * cos(4 * M_PI / p * (t + to)) + half) + 1;
 
     // More transforms based on time

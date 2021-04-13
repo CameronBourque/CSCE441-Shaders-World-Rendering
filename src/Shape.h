@@ -25,8 +25,7 @@ public:
     void init();
     virtual void draw(std::shared_ptr<Program> prog);
 
-    void loadBall();
-
+    float getMinYPos();
     std::vector<float>& getPosBuf() { return posBuf; }
 
 protected:

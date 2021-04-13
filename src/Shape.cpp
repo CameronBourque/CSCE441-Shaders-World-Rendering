@@ -164,3 +164,16 @@ void Shape::draw(shared_ptr<Program> prog)
 
 	GLSL::checkError(GET_FILE_LINE);
 }
+
+float Shape::getMinYPos()
+{
+    float minY = posBuf[1];
+    for(size_t i = 1; i < posBuf.size(); i += 3)
+    {
+        if(posBuf[i] < minY)
+        {
+            minY = posBuf[i];
+        }
+    }
+    return minY;
+}
