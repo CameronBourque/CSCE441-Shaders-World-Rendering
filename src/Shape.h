@@ -26,6 +26,7 @@ public:
     virtual void draw(std::shared_ptr<Program> prog);
 
     float getMinYPos();
+    float getMaxXPos();
     std::vector<float>& getPosBuf() { return posBuf; }
 
 protected:

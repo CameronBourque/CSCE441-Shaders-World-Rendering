@@ -177,3 +177,18 @@ float Shape::getMinYPos()
     }
     return minY;
 }
+
+float Shape::getMaxXPos() {
+
+    float maxX = posBuf[0];
+    for(size_t i = 0; i < posBuf.size(); i += 3)
+    {
+        if(posBuf[i] > maxX)
+        {
+            maxX = posBuf[i];
+        }
+    }
+    return maxX;
+}
+
+

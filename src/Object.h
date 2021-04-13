@@ -31,6 +31,8 @@ public:
     std::shared_ptr<Shape> getShape() { return shape; }
     glm::vec3 getTranslation() { return translation; }
 
+    virtual bool needsNewProgram() { return false; }
+
 protected:
     std::shared_ptr<Shape> shape;
 

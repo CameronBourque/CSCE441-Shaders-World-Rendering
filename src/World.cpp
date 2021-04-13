@@ -4,7 +4,7 @@ World::World(std::string resDir) :
     randEngine(std::random_device()()),
     randDist(0.0f, 1.0f)
 {
-    // Set up shader
+    // Set up shaders
     prog = std::make_shared<Program>();
     prog->setShaderNames(resDir + "blinn_phong_vert.glsl", resDir + "blinn_phong_frag.glsl");
     prog->setVerbose(true);
@@ -22,7 +22,24 @@ World::World(std::string resDir) :
     prog->addUniform("s");
     prog->setVerbose(false);
 
-    int objectShapes = 3;
+    surfaceProg = std::make_shared<Program>();
+    surfaceProg->setShaderNames(resDir + "surface_vert.glsl", resDir + "blinn_phong_frag.glsl");
+    surfaceProg->setVerbose(true);
+    surfaceProg->init();
+    surfaceProg->addAttribute("aPos");
+    surfaceProg->addUniform("ITMV");
+    surfaceProg->addUniform("MV");
+    surfaceProg->addUniform("P");
+    surfaceProg->addUniform("t");
+    surfaceProg->addUniform("lightPos");
+    surfaceProg->addUniform("lightColor");
+    surfaceProg->addUniform("ke");
+    surfaceProg->addUniform("kd");
+    surfaceProg->addUniform("ks");
+    surfaceProg->addUniform("s");
+    surfaceProg->setVerbose(false);
+
+    int objectShapes = 4;
     std::shared_ptr<Shape> bunny = std::make_shared<Shape>();
     bunny->loadMesh(resDir + "bunny.obj");
     bunny->init();
@@ -32,6 +49,7 @@ World::World(std::string resDir) :
     teapot->init();
 
     std::shared_ptr<Shape> ball = std::make_shared<BallShape>();
+    std::shared_ptr<Shape> surface = std::make_shared<SurfaceShape>();
 
     std::shared_ptr<Shape> square = std::make_shared<Shape>();
     square->loadMesh(resDir + "square.obj");
@@ -42,7 +60,7 @@ World::World(std::string resDir) :
                                       glm::vec3(0.0, 0.0, 0.0),
                                       glm::vec3(-M_PI / 2, 0.0, 0.0),
                                       glm::vec3(100.0, 1.0, 100.0),
-                                      glm::vec3(0.5, 0.5, 0.5),
+                                      glm::vec3(0.8, 0.8, 0.8),
                                       glm::vec3(1.0)
     );
 
@@ -99,6 +117,21 @@ World::World(std::string resDir) :
                 );
                 break;
             case 3:
+                obj = std::make_shared<Surface>(surface, // shape
+                                                glm::vec3((i % 10) - 4.5,
+                                                          0.0,
+                                                          ((i / 10) % 10) - 4.5
+                                                ), // translation
+                                                glm::vec3(0.0,
+                                                          0.0,
+                                                          -M_PI / 2), // angles
+                                                glm::vec3(0.05), // scale
+                                                glm::vec3(getRandom(),
+                                                          getRandom(),
+                                                          getRandom()
+                                                ), //kd
+                                                glm::vec3(1.0) // ks
+                );
                 break;
         }
         objs.push_back(obj);
@@ -151,12 +184,15 @@ void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& 
     // Draw objects
     for(std::shared_ptr<Object> obj : objs)
     {
-        obj->bind(prog);
-        MV->pushMatrix();
-        obj->transform(MV);
-        Object::bindTransform(prog, MV);
-        obj->draw(prog);
-        MV->popMatrix();
+        if(!obj->needsNewProgram())
+        {
+            obj->bind(prog);
+            MV->pushMatrix();
+            obj->transform(MV);
+            Object::bindTransform(prog, MV);
+            obj->draw(prog);
+            MV->popMatrix();
+        }
     }
 
     // Draw ground
@@ -169,6 +205,33 @@ void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& 
 
     // Unbind program
     prog->unbind();
+
+    // Bind surface program
+    surfaceProg->bind();
+
+    // Set perspective
+    glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
+
+    // Bind lights
+    bindLights(MV);
+
+    // Draw remaining objects
+    for(std::shared_ptr<Object> obj : objs)
+    {
+        if(obj->needsNewProgram())
+        {
+            glUniform1f(surfaceProg->getUniform("t"), (float)glfwGetTime());
+            obj->bind(surfaceProg);
+            MV->pushMatrix();
+            obj->transform(MV);
+            Object::bindTransform(surfaceProg, MV);
+            obj->draw(surfaceProg);
+            MV->popMatrix();
+        }
+    }
+
+    // Unbind surface program
+    surfaceProg->unbind();
 }
 
 void World::bindLights(std::shared_ptr<MatrixStack>& MV)

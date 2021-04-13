@@ -17,6 +17,8 @@
 #include "Teapot.h"
 #include "Ball.h"
 #include "BallShape.h"
+#include "Surface.h"
+#include "SurfaceShape.h"
 
 class World
 {
@@ -38,6 +40,7 @@ private:
     std::vector<std::shared_ptr<Object>> objs;
     std::vector<std::shared_ptr<Light>> lights;
     std::shared_ptr<Program> prog;
+    std::shared_ptr<Program> surfaceProg;
 };
 
 #endif
