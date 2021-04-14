@@ -137,17 +137,20 @@ World::World(std::string resDir) :
     // Set up lights
     for(int i = 0; i < 10; i++)
     {
-        std::shared_ptr<Light> light = std::make_shared<Light>(ball, // shape
-                                                               glm::vec3((float)i - 4,
-                                                                         0.1,
-                                                                         (float)i - 4
-                                                                        ), // translation
-                                                               glm::vec3(0.0), // angles
-                                                               glm::vec3(0.1), // scale
-                                                               glm::vec3(getRandom(),
-                                                                         getRandom(),
-                                                                         getRandom()
-                                                                        ) // ke
+        glm::vec3 translate = glm::vec3(getRandom() * 10.0f - 5.0f, 0.1f, getRandom() * 10.0f - 5.0f);
+        glm::vec3 angles = glm::vec3(0.0f, getRandom() * 2 * M_PI, 0.0f);
+        glm::vec3 scale = glm::vec3(getRandom() * 0.03f + 0.02f);
+        glm::vec3 ke = glm::vec3(getRandom(), getRandom(), getRandom());
+        float offset = getRandom() * 100;
+        float offsetScale = getRandom() * 0.25f + 0.1f;
+
+        std::shared_ptr<Light> light = std::make_shared<Light>(ball,
+                                                               translate,
+                                                               angles,
+                                                               scale,
+                                                               ke,
+                                                               offset,
+                                                               offsetScale
         );
         lights.push_back(light);
     }
@@ -238,8 +241,8 @@ void World::bindLights(std::shared_ptr<MatrixStack>& MV)
     glm::vec3 lightColor[10];
     for(int i = 0; i < 10; i++)
     {
-        glm::vec4 pos = MV->topMatrix() * glm::vec4(lights[i]->getTranslation(), 1);
-        lightPos[i] = pos;
+        //glm::vec4 pos = MV->topMatrix() * glm::vec4(lights[i]->getPosition(MV), 1);
+        lightPos[i] = lights[i]->getPosition(MV);
         lightColor[i] = lights[i]->getKE();
     }
     glUniform3fv(prog->getUniform("lightPos"), 10, glm::value_ptr(lightPos[0]));

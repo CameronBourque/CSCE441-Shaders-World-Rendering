@@ -1,7 +1,7 @@
 #include "Object.h"
 
 Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale,
-               glm::vec3 _ke) :
+               glm::vec3 _ke, float _offset, float _offsetScale) :
                shape(_shape),
                translation(_translation),
                angles(_angles),
@@ -10,8 +10,8 @@ Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3
                kd(0.0f),
                ks(0.0f),
                s(1.0f),
-               offset(0.0f),
-               offsetScale(1.0f)
+               offset(_offset),
+               offsetScale(_offsetScale)
 {
 }
 
