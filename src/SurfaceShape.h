@@ -24,7 +24,6 @@ public:
     ~SurfaceShape();
 
     void draw(std::shared_ptr<Program> prog);
-    float getMinYPos();
 
 private:
     std::map<std::string, GLuint> bufIDs;
