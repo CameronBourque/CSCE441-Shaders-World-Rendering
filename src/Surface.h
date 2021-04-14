@@ -13,10 +13,11 @@ class Surface : public Object
 {
 public:
     Surface(std::shared_ptr<Shape> shape, glm::vec3 translation, glm::vec3 angles, glm::vec3 scale, glm::vec3 kd,
-    glm::vec3 ks);
+    glm::vec3 ks, float offset, float offsetScale);
     ~Surface();
 
     void transform(std::shared_ptr<MatrixStack>& MV);
+    void bind(std::shared_ptr<Program>& prog, float t = 0.0f) const;
 
     bool needsNewProgram() { return true; }
 };

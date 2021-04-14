@@ -9,7 +9,9 @@ Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3
                ke(_ke),
                kd(0.0f),
                ks(0.0f),
-               s(1.0f)
+               s(1.0f),
+               offset(0.0f),
+               offsetScale(1.0f)
 {
 }
 
@@ -22,8 +24,26 @@ Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3
                ke(0.0f),
                kd(_kd),
                ks(_ks),
-               s(10.0f)
+               s(10.0f),
+               offset(0.0f),
+               offsetScale(1.0f)
 {
+}
+
+Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale,
+               glm::vec3 _kd, glm::vec3 _ks, float _offset, float _offsetScale) :
+               shape(_shape),
+               translation(_translation),
+               angles(_angles),
+               scale(_scale),
+               ke(0.0f),
+               kd(_kd),
+               ks(_ks),
+               s(10.0f),
+               offset(_offset),
+               offsetScale(_offsetScale)
+{
+
 }
 
 Object::~Object()
@@ -44,7 +64,7 @@ void Object::draw(std::shared_ptr<Program> &prog)
     shape->draw(prog);
 }
 
-void Object::bind(std::shared_ptr<Program>& prog) const
+void Object::bind(std::shared_ptr<Program>& prog, float t) const
 {
     // This will set the color for the object
     glUniform3f(prog->getUniform("ke"), ke.r, ke.g, ke.b);
@@ -55,6 +75,7 @@ void Object::bind(std::shared_ptr<Program>& prog) const
 
 void Object::bindTransform(std::shared_ptr<Program> &prog, std::shared_ptr<MatrixStack> &MV)
 {
+    // Bind the model view matrices
     glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
     glUniformMatrix4fv(prog->getUniform("ITMV"), 1, GL_FALSE,
                        glm::value_ptr(glm::transpose(glm::inverse(MV->topMatrix()))));

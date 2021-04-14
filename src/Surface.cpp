@@ -1,8 +1,8 @@
 #include "Surface.h"
 
 Surface::Surface(std::shared_ptr<Shape> shape, glm::vec3 translation, glm::vec3 angles, glm::vec3 scale, glm::vec3 kd,
-                 glm::vec3 ks) :
-                 Object(shape, translation, angles, scale, kd, ks)
+                 glm::vec3 ks, float offset, float offsetScale) :
+                 Object(shape, translation, angles, scale, kd, ks, offset, offsetScale)
 {
 }
 
@@ -24,4 +24,14 @@ void Surface::transform(std::shared_ptr<MatrixStack> &MV)
     MV->rotate(angles.x, 1, 0, 0);
     MV->rotate(angles.y, 0, 1, 0);
     MV->rotate(angles.z, 0, 0, 1);
+}
+
+void Surface::bind(std::shared_ptr<Program> &prog, float t) const
+{
+    // Bind just like a normal object
+    Object::bind(prog);
+
+    // Need to also bind the animation
+    float time = (t * offsetScale) + offset;
+    glUniform1f(prog->getUniform("t"), time);
 }

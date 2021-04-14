@@ -1,8 +1,8 @@
 #include "Ball.h"
 
 Ball::Ball(std::shared_ptr<Shape> shape, glm::vec3 translation, glm::vec3 angles, glm::vec3 scale, glm::vec3 kd,
-           glm::vec3 ks) :
-           Object(shape, translation, angles, scale, kd, ks)
+           glm::vec3 ks, float offset, float offsetScale) :
+           Object(shape, translation, angles, scale, kd, ks, offset, offsetScale)
 {
 }
 
@@ -26,7 +26,7 @@ void Ball::transform(std::shared_ptr<MatrixStack> &MV)
     MV->rotate(angles.z, 0, 0, 1);
 
     // Constants
-    float t = glfwGetTime();
+    float t = (glfwGetTime() * offsetScale) + offset;
     float yFactor = 1.3f;
     float sFactor = 0.5f;
     float p = 1.7f;

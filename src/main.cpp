@@ -151,8 +151,6 @@ static void render()
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 	camera->setAspect((float)width/(float)height);
-	
-	double t = glfwGetTime();
 
     std::shared_ptr<MatrixStack> P = std::make_shared<MatrixStack>();
     std::shared_ptr<MatrixStack> MV = std::make_shared<MatrixStack>();
@@ -167,7 +165,7 @@ static void render()
     MV->pushMatrix();
     camera->applyViewMatrix(MV);
     // Draw world
-	world->draw(P, MV, t);
+	world->draw(P, MV);
     // Pop matrix stacks
     MV->popMatrix();
     P->popMatrix();

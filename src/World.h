@@ -27,7 +27,7 @@ public:
 
     ~World();
 
-    void draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, double t);
+    void draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV);
 
 private:
     inline float getRandom() { return randDist(randEngine); }

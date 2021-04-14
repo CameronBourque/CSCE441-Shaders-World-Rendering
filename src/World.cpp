@@ -67,70 +67,67 @@ World::World(std::string resDir) :
     // Set up world objects
     for(int i = 0; i < 100; i++)
     {
+        // Find inputs for objects
+        glm::vec3 translate = glm::vec3((i % 10) - 4.5, 0.0, ((i / 10) % 10) - 4.5);
+        glm::vec3 angles = glm::vec3(0.0, getRandom() * 2 * M_PI, 0.0);
+        glm::vec3 scale = glm::vec3(getRandom() * 0.25f + 0.125f);
+        glm::vec3 kd = glm::vec3(getRandom(), getRandom(), getRandom());
+        glm::vec3 ks = glm::vec3(1.0);
+        float offset = getRandom() * 100;
+        float offsetScale = getRandom() + 0.5f;
+
+        // Figure out which object it is
         size_t shapeIndex = (i % objectShapes);
         std::shared_ptr<Object> obj;
         switch (shapeIndex)
         {
             case 0:
-                obj = std::make_shared<Bunny>(bunny, // shape
-                                              glm::vec3((i % 10) - 4.5,
-                                                        0.0,
-                                                        ((i / 10) % 10) - 4.5
-                                              ), // translation
-                                              glm::vec3(0.0), // angles
-                                              glm::vec3(0.25), // scale
-                                              glm::vec3(getRandom(),
-                                                        getRandom(),
-                                                        getRandom()
-                                              ), //kd
-                                              glm::vec3(1.0) // ks
+                offset = getRandom() + 0.5f;
+                obj = std::make_shared<Bunny>(bunny,
+                                              translate,
+                                              angles,
+                                              scale,
+                                              kd,
+                                              ks,
+                                              offset,
+                                              offsetScale
                 );
                 break;
             case 1:
-                obj = std::make_shared<Teapot>(teapot, // shape
-                                               glm::vec3((i % 10) - 4.5,
-                                                         0.0,
-                                                         ((i / 10) % 10) - 4.5
-                                               ), // translation
-                                               glm::vec3(0.0), // angles
-                                               glm::vec3(0.25), // scale
-                                               glm::vec3(getRandom(),
-                                                         getRandom(),
-                                                         getRandom()
-                                               ), //kd
-                                               glm::vec3(1.0) // ks
+                obj = std::make_shared<Teapot>(teapot,
+                                               translate,
+                                               angles,
+                                               scale,
+                                               kd,
+                                               ks,
+                                               offset,
+                                               offsetScale
                 );
                 break;
             case 2:
-                obj = std::make_shared<Ball>(ball, // shape
-                                             glm::vec3((i % 10) - 4.5,
-                                                       0.0,
-                                                       ((i / 10) % 10) - 4.5
-                                             ), // translation
-                                             glm::vec3(0.0), // angles
-                                             glm::vec3(0.25), // scale
-                                             glm::vec3(getRandom(),
-                                                       getRandom(),
-                                                       getRandom()
-                                             ), //kd
-                                             glm::vec3(1.0) // ks
+                scale *= 0.75f;
+                offsetScale *= 0.5f;
+                obj = std::make_shared<Ball>(ball,
+                                             translate,
+                                             angles,
+                                             scale,
+                                             kd,
+                                             ks,
+                                             offset,
+                                             offsetScale
                 );
                 break;
             case 3:
-                obj = std::make_shared<Surface>(surface, // shape
-                                                glm::vec3((i % 10) - 4.5,
-                                                          0.0,
-                                                          ((i / 10) % 10) - 4.5
-                                                ), // translation
-                                                glm::vec3(0.0,
-                                                          0.0,
-                                                          -M_PI / 2), // angles
-                                                glm::vec3(0.05), // scale
-                                                glm::vec3(getRandom(),
-                                                          getRandom(),
-                                                          getRandom()
-                                                ), //kd
-                                                glm::vec3(1.0) // ks
+                angles.z = -M_PI / 2;
+                scale *= 0.2f;
+                obj = std::make_shared<Surface>(surface,
+                                                translate,
+                                                angles,
+                                                scale,
+                                                kd,
+                                                ks,
+                                                offset,
+                                                offsetScale
                 );
                 break;
         }
@@ -140,7 +137,7 @@ World::World(std::string resDir) :
     // Set up lights
     for(int i = 0; i < 10; i++)
     {
-        std::shared_ptr<Light> light = std::make_shared<Light>(ball,
+        std::shared_ptr<Light> light = std::make_shared<Light>(ball, // shape
                                                                glm::vec3((float)i - 4,
                                                                          0.1,
                                                                          (float)i - 4
@@ -159,7 +156,7 @@ World::World(std::string resDir) :
 World::~World()
 {}
 
-void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, double t)
+void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV)
 {
     // Bind program
     prog->bind();
@@ -216,12 +213,12 @@ void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& 
     bindLights(MV);
 
     // Draw remaining objects
+    float t = (float)glfwGetTime();
     for(std::shared_ptr<Object> obj : objs)
     {
         if(obj->needsNewProgram())
         {
-            glUniform1f(surfaceProg->getUniform("t"), (float)glfwGetTime());
-            obj->bind(surfaceProg);
+            obj->bind(surfaceProg, t);
             MV->pushMatrix();
             obj->transform(MV);
             Object::bindTransform(surfaceProg, MV);

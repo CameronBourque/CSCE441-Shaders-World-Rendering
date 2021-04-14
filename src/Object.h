@@ -21,11 +21,13 @@ public:
     Object(std::shared_ptr<Shape>& _shape, glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale, glm::vec3 _ke);
     Object(std::shared_ptr<Shape>& _shape, glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale, glm::vec3 _kd,
            glm::vec3 _ks);
+    Object(std::shared_ptr<Shape>& _shape, glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale, glm::vec3 _kd,
+           glm::vec3 _ks, float _offset, float _offsetScale);
     ~Object();
 
     virtual void transform(std::shared_ptr<MatrixStack>& MV);
     virtual void draw(std::shared_ptr<Program>& prog);
-    void bind(std::shared_ptr<Program>& prog) const;
+    virtual void bind(std::shared_ptr<Program>& prog, float t = 0.0f) const;
     static void bindTransform(std::shared_ptr<Program>& prog, std::shared_ptr<MatrixStack>& MV);
 
     std::shared_ptr<Shape> getShape() { return shape; }
@@ -44,6 +46,9 @@ protected:
     glm::vec3 kd;
     glm::vec3 ks;
     float s;
+
+    float offset;
+    float offsetScale;
 
 };
 
