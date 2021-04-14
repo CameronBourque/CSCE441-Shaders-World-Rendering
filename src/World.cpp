@@ -2,7 +2,8 @@
 
 World::World(std::string resDir) :
     randEngine(std::random_device()()),
-    randDist(0.0f, 1.0f)
+    randDist(0.0f, 1.0f),
+    lightCount(25)
 {
     // Set up shaders
     prog = std::make_shared<Program>();
@@ -60,7 +61,7 @@ World::World(std::string resDir) :
                                       glm::vec3(0.0, 0.0, 0.0),
                                       glm::vec3(-M_PI / 2, 0.0, 0.0),
                                       glm::vec3(100.0, 1.0, 100.0),
-                                      glm::vec3(0.8, 0.8, 0.8),
+                                      glm::vec3(0.1, 0.1, 0.1),
                                       glm::vec3(1.0)
     );
 
@@ -118,7 +119,7 @@ World::World(std::string resDir) :
                 );
                 break;
             case 3:
-                angles.z = -M_PI / 2;
+                angles.z = M_PI / 2;
                 scale *= 0.2f;
                 obj = std::make_shared<Surface>(surface,
                                                 translate,
@@ -135,7 +136,7 @@ World::World(std::string resDir) :
     }
 
     // Set up lights
-    for(int i = 0; i < 10; i++)
+    for(size_t i = 0; i < lightCount; i++)
     {
         glm::vec3 translate = glm::vec3(getRandom() * 10.0f - 5.0f, 0.1f, getRandom() * 10.0f - 5.0f);
         glm::vec3 angles = glm::vec3(0.0f, getRandom() * 2 * M_PI, 0.0f);
@@ -237,14 +238,14 @@ void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& 
 void World::bindLights(std::shared_ptr<MatrixStack>& MV)
 {
     // Set light positions
-    glm::vec3 lightPos[10];
-    glm::vec3 lightColor[10];
-    for(int i = 0; i < 10; i++)
+    glm::vec3 lightPos[25];
+    glm::vec3 lightColor[25];
+    for(size_t i = 0; i < lightCount; i++)
     {
         //glm::vec4 pos = MV->topMatrix() * glm::vec4(lights[i]->getPosition(MV), 1);
         lightPos[i] = lights[i]->getPosition(MV);
         lightColor[i] = lights[i]->getKE();
     }
-    glUniform3fv(prog->getUniform("lightPos"), 10, glm::value_ptr(lightPos[0]));
-    glUniform3fv(prog->getUniform("lightColor"), 10, glm::value_ptr(lightColor[0]));
+    glUniform3fv(prog->getUniform("lightPos"), lightCount, glm::value_ptr(lightPos[0]));
+    glUniform3fv(prog->getUniform("lightColor"), lightCount, glm::value_ptr(lightColor[0]));
 }

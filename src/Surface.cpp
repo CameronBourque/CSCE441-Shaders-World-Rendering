@@ -13,13 +13,13 @@ Surface::~Surface()
 void Surface::transform(std::shared_ptr<MatrixStack> &MV)
 {
     // Need to adjust for the object's min y value if it's grounded
-    float maxX = shape->getMaxXPos();
+    float minX = shape->getMinXPos();
 
     // Fix min y to scale of object
-    maxX = maxX * scale.y;
+    minX = minX * scale.y;
 
     // Transform the shape
-    MV->translate(glm::vec3(translation.x, translation.y + maxX, translation.z));
+    MV->translate(glm::vec3(translation.x, translation.y - minX, translation.z));
     MV->scale(scale);
     MV->rotate(angles.x, 1, 0, 0);
     MV->rotate(angles.y, 0, 1, 0);

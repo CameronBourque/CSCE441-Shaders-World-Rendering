@@ -1,7 +1,7 @@
 #version 120
 
-uniform vec3 lightPos[10];
-uniform vec3 lightColor[10];
+uniform vec3 lightPos[25];
+uniform vec3 lightColor[25];
 uniform vec3 ke;
 uniform vec3 kd;
 uniform vec3 ks;
@@ -24,7 +24,7 @@ void main()
 	vec3 fragColor = ke;
 
 	// get the color
-	for(int i = 0; i < 10; i++)
+	for(int i = 0; i < 25; i++)
 	{
 		float r = distance(lightPos[i], p.xyz);
 

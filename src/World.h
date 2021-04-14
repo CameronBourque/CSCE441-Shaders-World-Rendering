@@ -41,6 +41,8 @@ private:
     std::vector<std::shared_ptr<Light>> lights;
     std::shared_ptr<Program> prog;
     std::shared_ptr<Program> surfaceProg;
+
+    size_t lightCount;
 };
 
 #endif
