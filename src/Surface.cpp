@@ -33,7 +33,6 @@ void Surface::bind(std::shared_ptr<Program> &prog, float t) const
     Object::bind(prog);
 
     // Need to also bind the animation
-    float time = (glfwGetTime() * offsetScale) - offset;
-//    std::cout << time << std::endl;
+    float time = (t * offsetScale) + offset;
     glUniform1f(prog->getUniform("t"), time);
 }
