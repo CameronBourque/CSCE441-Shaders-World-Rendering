@@ -17,7 +17,9 @@ public:
     ~Surface();
 
     void transform(std::shared_ptr<MatrixStack>& MV);
-    void bind(std::shared_ptr<Program>& prog, float t = 0.0f) const;
+    void bind(std::shared_ptr<Program>& prog, float t) const;
+
+    void bindFirstPass(std::shared_ptr<Program>& prog, std::shared_ptr<MatrixStack> &MV, float t) const;
 
     bool needsNewProgram() { return true; }
 };

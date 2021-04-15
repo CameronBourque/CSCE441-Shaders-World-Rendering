@@ -30,6 +30,7 @@ bool OFFLINE = false;
 
 shared_ptr<Camera> camera;
 shared_ptr<World> world;
+GLuint frameBufferID;
 
 bool keyToggles[256] = {false}; // only for English keyboards!
 
@@ -126,7 +127,11 @@ static void init()
 	camera = make_shared<Camera>();
 	camera->setInitDistance(2.0f); // Camera's initial Z translation
 
-    world = make_shared<World>(RESOURCE_DIR);
+	int width;
+	int height;
+    glfwGetFramebufferSize(window, &width, &height);
+
+    world = make_shared<World>(RESOURCE_DIR, width, height, frameBufferID);
 	
 	GLSL::checkError(GET_FILE_LINE);
 }
@@ -155,17 +160,38 @@ static void render()
     std::shared_ptr<MatrixStack> P = std::make_shared<MatrixStack>();
     std::shared_ptr<MatrixStack> MV = std::make_shared<MatrixStack>();
 
-    // Make sure the viewport is correct
+    // Set up for pass 1
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
     glViewport(0, 0, width, height);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Apply projection matrix
     P->pushMatrix();
     camera->applyProjectionMatrix(P);
-    // Apply view matrix
     MV->pushMatrix();
     camera->applyViewMatrix(MV);
     // Draw world
-	world->draw(P, MV);
+	world->drawFrameBuffer(P, MV);
+    // Pop matrix stacks
+    MV->popMatrix();
+    P->popMatrix();
+
+    // Set up for pass 2
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glfwGetFramebufferSize(window, &width, &height);
+    glViewport(0, 0, width, height);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Apply matrices
+    P->pushMatrix();
+    camera->applyProjectionMatrix(P);
+    MV->pushMatrix();
+    // Draw world
+    world->drawScreen(P, MV, glm::vec2(width, height));
     // Pop matrix stacks
     MV->popMatrix();
     P->popMatrix();
@@ -199,7 +225,8 @@ int main(int argc, char **argv)
 		return -1;
 	}
 	// Create a windowed mode window and its OpenGL context.
-	window = glfwCreateWindow(640, 480, "Cameron Bourque", NULL, NULL);
+	//window = glfwCreateWindow(640, 480, "Cameron Bourque", NULL, NULL);
+    window = glfwCreateWindow(1440, 1080, "Cameron Bourque", NULL, NULL);
 	if(!window) {
 		glfwTerminate();
 		return -1;

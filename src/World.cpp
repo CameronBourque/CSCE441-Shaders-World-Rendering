@@ -1,13 +1,15 @@
 #include "World.h"
 
-World::World(std::string resDir) :
+#include <iostream>
+
+World::World(std::string& resDir, int texWidth, int texHeight, GLuint& frameBufferID) :
     randEngine(std::random_device()()),
     randDist(0.0f, 1.0f),
     lightCount(25)
 {
-    // Set up shaders
+    // Set up first pass shaders
     prog = std::make_shared<Program>();
-    prog->setShaderNames(resDir + "blinn_phong_vert.glsl", resDir + "blinn_phong_frag.glsl");
+    prog->setShaderNames(resDir + "blinn_phong_vert.glsl", resDir + "pass1_frag.glsl");
     prog->setVerbose(true);
     prog->init();
     prog->addAttribute("aPos");
@@ -15,16 +17,12 @@ World::World(std::string resDir) :
     prog->addUniform("ITMV");
     prog->addUniform("MV");
     prog->addUniform("P");
-    prog->addUniform("lightPos");
-    prog->addUniform("lightColor");
     prog->addUniform("ke");
     prog->addUniform("kd");
-    prog->addUniform("ks");
-    prog->addUniform("s");
     prog->setVerbose(false);
 
     surfaceProg = std::make_shared<Program>();
-    surfaceProg->setShaderNames(resDir + "surface_vert.glsl", resDir + "blinn_phong_frag.glsl");
+    surfaceProg->setShaderNames(resDir + "surface_vert.glsl", resDir + "pass1_frag.glsl");
     surfaceProg->setVerbose(true);
     surfaceProg->init();
     surfaceProg->addAttribute("aPos");
@@ -32,14 +30,36 @@ World::World(std::string resDir) :
     surfaceProg->addUniform("MV");
     surfaceProg->addUniform("P");
     surfaceProg->addUniform("t");
-    surfaceProg->addUniform("lightPos");
-    surfaceProg->addUniform("lightColor");
     surfaceProg->addUniform("ke");
     surfaceProg->addUniform("kd");
-    surfaceProg->addUniform("ks");
-    surfaceProg->addUniform("s");
     surfaceProg->setVerbose(false);
 
+    // Set up second pass shader
+    secondPass = std::make_shared<Program>();
+    secondPass->setShaderNames(resDir + "pass2_vert.glsl", resDir + "pass2_frag.glsl");
+    secondPass->setVerbose(true);
+    secondPass->init();
+    secondPass->addAttribute("aPos");
+    secondPass->addUniform("P");
+    secondPass->addUniform("MV");
+    secondPass->addUniform("posTexture");
+    secondPass->addUniform("norTexture");
+    secondPass->addUniform("keTexture");
+    secondPass->addUniform("kdTexture");
+    secondPass->addUniform("windowSize");
+    secondPass->addUniform("lightPos");
+    secondPass->addUniform("lightColor");
+    secondPass->addUniform("ks");
+    secondPass->addUniform("s");
+    secondPass->setVerbose(false);
+    secondPass->bind();
+    glUniform1i(secondPass->getUniform("posTexture"), 0);
+    glUniform1i(secondPass->getUniform("norTexture"), 1);
+    glUniform1i(secondPass->getUniform("keTexture"), 2);
+    glUniform1i(secondPass->getUniform("kdTexture"), 3);
+    secondPass->unbind();
+
+    // Create shapes
     int objectShapes = 4;
     std::shared_ptr<Shape> bunny = std::make_shared<Shape>();
     bunny->loadMesh(resDir + "bunny.obj");
@@ -56,13 +76,83 @@ World::World(std::string resDir) :
     square->loadMesh(resDir + "square.obj");
     square->init();
 
+    std::shared_ptr<Shape> cube = std::make_shared<Shape>();
+    cube->loadMesh(resDir + "cube.obj");
+    cube->init();
+
+    // Set up texture data for passes
+    glGenFramebuffers(1, &frameBufferID);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+
+    glGenTextures(1, &posTex);
+    glBindTexture(GL_TEXTURE_2D, posTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, texWidth, texHeight, 0, GL_RGB, GL_FLOAT, NULL);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, posTex, 0);
+
+    glGenTextures(1, &norTex);
+    glBindTexture(GL_TEXTURE_2D, norTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, texWidth, texHeight, 0, GL_RGB, GL_FLOAT, NULL);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, norTex, 0);
+
+    glGenTextures(1, &emisTex);
+    glBindTexture(GL_TEXTURE_2D, emisTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, texWidth, texHeight, 0, GL_RGB, GL_FLOAT, NULL);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, emisTex, 0);
+
+    glGenTextures(1, &diffTex);
+    glBindTexture(GL_TEXTURE_2D, diffTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, texWidth, texHeight, 0, GL_RGB, GL_FLOAT, NULL);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, diffTex, 0);
+    GLSL::checkError(GET_FILE_LINE);
+
+    GLuint depthRenderBuffer;
+    glGenRenderbuffers(1, &depthRenderBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, texWidth, texHeight);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBuffer);
+
+    GLenum attachments[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+    glDrawBuffers(4, attachments);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cerr << "Framebuffer is not ok" << std::endl;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    GLSL::checkError(GET_FILE_LINE);
+
     // Set up the ground
     ground = std::make_shared<Object>(square,
                                       glm::vec3(0.0, 0.0, 0.0),
                                       glm::vec3(-M_PI / 2, 0.0, 0.0),
                                       glm::vec3(100.0, 1.0, 100.0),
-                                      glm::vec3(0.1, 0.1, 0.1),
-                                      glm::vec3(1.0)
+                                      glm::vec3(1.0, 1.0, 1.0),
+                                      glm::vec3(0.25)
+    );
+
+    // Set up box
+    box = std::make_shared<Object>(cube,
+                                   glm::vec3(0.0),
+                                   glm::vec3(0.0),
+                                   glm::vec3(0.0),
+                                   glm::vec3(0.0f)
     );
 
     // Set up world objects
@@ -242,10 +332,104 @@ void World::bindLights(std::shared_ptr<MatrixStack>& MV)
     glm::vec3 lightColor[25];
     for(size_t i = 0; i < lightCount; i++)
     {
-        //glm::vec4 pos = MV->topMatrix() * glm::vec4(lights[i]->getPosition(MV), 1);
         lightPos[i] = lights[i]->getPosition(MV);
         lightColor[i] = lights[i]->getKE();
     }
-    glUniform3fv(prog->getUniform("lightPos"), lightCount, glm::value_ptr(lightPos[0]));
-    glUniform3fv(prog->getUniform("lightColor"), lightCount, glm::value_ptr(lightColor[0]));
+    glUniform3fv(secondPass->getUniform("lightPos"), lightCount, glm::value_ptr(lightPos[0]));
+    glUniform3fv(secondPass->getUniform("lightColor"), lightCount, glm::value_ptr(lightColor[0]));
+}
+
+void World::drawFrameBuffer(std::shared_ptr<MatrixStack> &P, std::shared_ptr<MatrixStack> &MV)
+{
+    // Bind program
+    prog->bind();
+
+    // Set perspective
+    glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
+
+    // Draw lights
+    for(std::shared_ptr<Light> light : lights)
+    {
+        MV->pushMatrix();
+        light->transform(MV);
+        light->bindFirstPass(prog, MV);
+        light->draw(prog);
+        MV->popMatrix();
+    }
+
+    // Draw objects
+    for(std::shared_ptr<Object> obj : objs)
+    {
+        if(!obj->needsNewProgram())
+        {
+            MV->pushMatrix();
+            obj->transform(MV);
+            obj->bindFirstPass(prog, MV);
+            obj->draw(prog);
+            MV->popMatrix();
+        }
+    }
+
+    // Draw ground
+    MV->pushMatrix();
+    ground->transform(MV);
+    ground->bindFirstPass(prog, MV);
+    ground->draw(prog);
+    MV->popMatrix();
+
+    // Unbind program
+    prog->unbind();
+
+    // Bind surface program
+    surfaceProg->bind();
+
+    // Set perspective
+    glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
+
+    // Draw remaining objects
+    float t = (float)glfwGetTime();
+    for(std::shared_ptr<Object> obj : objs)
+    {
+        if(obj->needsNewProgram())
+        {
+            MV->pushMatrix();
+            obj->transform(MV);
+            obj->bindFirstPass(prog, MV, t);
+            obj->draw(surfaceProg);
+            MV->popMatrix();
+        }
+    }
+
+    // Unbind surface program
+    surfaceProg->unbind();
+
+    // Bind lights and materials to second pass
+    secondPass->bind();
+    bindLights(MV);
+    glUniform3f(secondPass->getUniform("ks"), 1.0f, 1.0f, 1.0f);
+    glUniform1f(secondPass->getUniform("s"), 10);
+    secondPass->unbind();
+}
+
+void World::drawScreen(std::shared_ptr<MatrixStack> &P, std::shared_ptr<MatrixStack> &MV, glm::vec2 windowSize)
+{
+    // Bind program
+    secondPass->bind();
+
+    // Set perspective
+    glUniformMatrix4fv(secondPass->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
+    glUniformMatrix4fv(secondPass->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
+    glUniform2f(secondPass->getUniform("windowSize"), windowSize.x, windowSize.y);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, posTex);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, norTex);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, emisTex);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, diffTex);
+
+    box->draw(prog);
+    secondPass->unbind();
 }

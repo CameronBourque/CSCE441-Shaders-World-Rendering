@@ -1,24 +1,36 @@
 #version 120
 
+uniform sampler2D posTexture;
+uniform sampler2D norTexture;
+uniform sampler2D keTexture;
+uniform sampler2D kdTexture;
+uniform vec2 windowSize;
+
+// more uniforms for lighting
 uniform vec3 lightPos[25];
 uniform vec3 lightColor[25];
-uniform vec3 ke;
-uniform vec3 kd;
 uniform vec3 ks;
 uniform float s;
 
-varying vec4 p; // in camera space
-varying vec3 cNor; // in camera space
-
 void main()
 {
+    vec2 tex;
+    tex.x = gl_FragCoord.x/windowSize.x;
+    tex.y = gl_FragCoord.y/windowSize.y;
+
+    // fetch shading data
+    vec3 p = texture2D(posTexture, tex).rgb;
+    vec3 nor = texture2D(norTexture, tex).rgb;
+    vec3 ke = texture2D(keTexture, tex).rgb;
+    vec3 kd = texture2D(kdTexture, tex).rgb;
+
 	// set some constants
 	float A0 = 1.0;
 	float A1 = 0.0429;
 	float A2 = 0.9857;
 
 	// get the normalized normals
-	vec3 n = normalize(cNor);
+	vec3 n = normalize(nor);
 
 	// start with ke for the color
 	vec3 fragColor = ke;
@@ -42,4 +54,8 @@ void main()
 		fragColor += color * attenuation;
 	}
 	gl_FragColor = vec4(fragColor, 1.0);
+	//gl_FragColor.rgb = p;
+	//gl_FragColor.rgb = nor;
+	//gl_FragColor.rgb = ke;
+	//gl_FragColor.rgb = kd;
 }

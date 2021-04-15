@@ -16,6 +16,21 @@ Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3
 }
 
 Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale,
+               glm::vec3 _ke) :
+               shape(_shape),
+               translation(_translation),
+               angles(_angles),
+               scale(_scale),
+               ke(_ke),
+               kd(0.0f),
+               ks(0.0f),
+               s(1.0f),
+               offset(0.0f),
+               offsetScale(1.0f)
+{
+}
+
+Object::Object(std::shared_ptr<Shape> &_shape, glm::vec3 _translation, glm::vec3 _angles, glm::vec3 _scale,
                glm::vec3 _kd, glm::vec3 _ks) :
                shape(_shape),
                translation(_translation),
@@ -75,6 +90,18 @@ void Object::bind(std::shared_ptr<Program>& prog, float t) const
 
 void Object::bindTransform(std::shared_ptr<Program> &prog, std::shared_ptr<MatrixStack> &MV)
 {
+    // Bind the model view matrices
+    glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
+    glUniformMatrix4fv(prog->getUniform("ITMV"), 1, GL_FALSE,
+                       glm::value_ptr(glm::transpose(glm::inverse(MV->topMatrix()))));
+}
+
+void Object::bindFirstPass(std::shared_ptr<Program> &prog, std::shared_ptr<MatrixStack> &MV, float t) const
+{
+    // Bind material values
+    glUniform3f(prog->getUniform("ke"), ke.r, ke.g, ke.b);
+    glUniform3f(prog->getUniform("kd"), kd.r, kd.g, kd.b);
+
     // Bind the model view matrices
     glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
     glUniformMatrix4fv(prog->getUniform("ITMV"), 1, GL_FALSE,
