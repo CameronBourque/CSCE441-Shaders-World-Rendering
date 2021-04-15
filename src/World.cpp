@@ -346,6 +346,7 @@ void World::drawScreen(std::shared_ptr<MatrixStack> &P, std::shared_ptr<MatrixSt
     glUniformMatrix4fv(secondPass->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
     glUniform2f(secondPass->getUniform("windowSize"), windowSize.x, windowSize.y);
 
+    // Bind textures
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, posTex);
     glActiveTexture(GL_TEXTURE1);
@@ -355,6 +356,9 @@ void World::drawScreen(std::shared_ptr<MatrixStack> &P, std::shared_ptr<MatrixSt
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, diffTex);
 
+    // Draw the box
     box->draw(prog);
+
+    // Unbind program
     secondPass->unbind();
 }

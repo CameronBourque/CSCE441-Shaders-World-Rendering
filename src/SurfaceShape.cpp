@@ -46,10 +46,6 @@ SurfaceShape::SurfaceShape()
         }
     }
 
-    //
-    // END IMPLEMENT ME
-    //
-
     // Total number of indices
     indCount = (int)indBuf.size();
 

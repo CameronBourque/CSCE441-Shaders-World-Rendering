@@ -226,7 +226,6 @@ int main(int argc, char **argv)
 	}
 	// Create a windowed mode window and its OpenGL context.
 	window = glfwCreateWindow(640, 480, "Cameron Bourque", NULL, NULL);
-    //window = glfwCreateWindow(1440, 1080, "Cameron Bourque", NULL, NULL);
 	if(!window) {
 		glfwTerminate();
 		return -1;

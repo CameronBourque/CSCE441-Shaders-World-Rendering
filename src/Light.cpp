@@ -43,7 +43,6 @@ void Light::transform(std::shared_ptr<MatrixStack> &MV)
     MV->translate(0.0f, y, 0.0f);
 }
 
-#include <iostream>
 glm::vec3 Light::getPosition(std::shared_ptr<MatrixStack> MV)
 {
     MV->pushMatrix();
