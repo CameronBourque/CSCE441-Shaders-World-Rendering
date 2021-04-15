@@ -125,7 +125,7 @@ static void init()
 	glEnable(GL_DEPTH_TEST);
 	
 	camera = make_shared<Camera>();
-	camera->setInitDistance(2.0f); // Camera's initial Z translation
+	camera->setInitDistance(10.0f); // Camera's initial Z translation
 
 	int width;
 	int height;
@@ -225,8 +225,8 @@ int main(int argc, char **argv)
 		return -1;
 	}
 	// Create a windowed mode window and its OpenGL context.
-	//window = glfwCreateWindow(640, 480, "Cameron Bourque", NULL, NULL);
-    window = glfwCreateWindow(1440, 1080, "Cameron Bourque", NULL, NULL);
+	window = glfwCreateWindow(640, 480, "Cameron Bourque", NULL, NULL);
+    //window = glfwCreateWindow(1440, 1080, "Cameron Bourque", NULL, NULL);
 	if(!window) {
 		glfwTerminate();
 		return -1;

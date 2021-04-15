@@ -142,7 +142,7 @@ World::World(std::string& resDir, int texWidth, int texHeight, GLuint& frameBuff
     ground = std::make_shared<Object>(square,
                                       glm::vec3(0.0, 0.0, 0.0),
                                       glm::vec3(-M_PI / 2, 0.0, 0.0),
-                                      glm::vec3(100.0, 1.0, 100.0),
+                                      glm::vec3(25.0, 1.0, 25.0),
                                       glm::vec3(1.0, 1.0, 1.0),
                                       glm::vec3(0.25)
     );

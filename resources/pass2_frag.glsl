@@ -53,9 +53,9 @@ void main()
 		float attenuation = 1.0f / (A0 + (A1 * r) + (A2 * r * r));
 		fragColor += color * attenuation;
 	}
-	gl_FragColor = vec4(fragColor, 1.0);
-	//gl_FragColor.rgb = p;
-	//gl_FragColor.rgb = nor;
-	//gl_FragColor.rgb = ke;
-	//gl_FragColor.rgb = kd;
+	gl_FragColor = vec4(fragColor, 1.0);	// Default output
+	//gl_FragColor.rgb = p;		// Position output
+	//gl_FragColor.rgb = nor;	// Normal output
+	//gl_FragColor.rgb = ke;	// Emissive output
+	//gl_FragColor.rgb = kd;	// Diffuse output
 }
