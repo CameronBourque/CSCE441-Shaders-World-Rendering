@@ -29,8 +29,6 @@ public:
 
     virtual void transform(std::shared_ptr<MatrixStack>& MV);
     virtual void draw(std::shared_ptr<Program>& prog);
-    virtual void bind(std::shared_ptr<Program>& prog, float t = 0.0f) const;
-    static void bindTransform(std::shared_ptr<Program>& prog, std::shared_ptr<MatrixStack>& MV);
 
     virtual void bindFirstPass(std::shared_ptr<Program>& prog, std::shared_ptr<MatrixStack> &MV, float t = 0.0f) const;
 

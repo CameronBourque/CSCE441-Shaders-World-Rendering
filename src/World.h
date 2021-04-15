@@ -27,7 +27,6 @@ public:
 
     ~World();
 
-    void draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV);
     void drawFrameBuffer(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV);
     void drawScreen(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV, glm::vec2 windowSize);
 

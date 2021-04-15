@@ -79,23 +79,6 @@ void Object::draw(std::shared_ptr<Program> &prog)
     shape->draw(prog);
 }
 
-void Object::bind(std::shared_ptr<Program>& prog, float t) const
-{
-    // This will set the color for the object
-    glUniform3f(prog->getUniform("ke"), ke.r, ke.g, ke.b);
-    glUniform3f(prog->getUniform("kd"), kd.r, kd.g, kd.b);
-    glUniform3f(prog->getUniform("ks"), ks.r, ks.g, ks.b);
-    glUniform1f(prog->getUniform("s"), s);
-}
-
-void Object::bindTransform(std::shared_ptr<Program> &prog, std::shared_ptr<MatrixStack> &MV)
-{
-    // Bind the model view matrices
-    glUniformMatrix4fv(prog->getUniform("MV"), 1, GL_FALSE, glm::value_ptr(MV->topMatrix()));
-    glUniformMatrix4fv(prog->getUniform("ITMV"), 1, GL_FALSE,
-                       glm::value_ptr(glm::transpose(glm::inverse(MV->topMatrix()))));
-}
-
 void Object::bindFirstPass(std::shared_ptr<Program> &prog, std::shared_ptr<MatrixStack> &MV, float t) const
 {
     // Bind material values

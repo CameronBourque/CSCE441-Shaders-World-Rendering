@@ -228,7 +228,7 @@ World::World(std::string& resDir, int texWidth, int texHeight, GLuint& frameBuff
     // Set up lights
     for(size_t i = 0; i < lightCount; i++)
     {
-        glm::vec3 translate = glm::vec3(getRandom() * 10.0f - 5.0f, 0.1f, getRandom() * 10.0f - 5.0f);
+        glm::vec3 translate = glm::vec3(getRandom() * 7.5f - 3.75f, 0.1f, getRandom() * 7.5f - 3.75f);
         glm::vec3 angles = glm::vec3(0.0f, getRandom() * 2 * M_PI, 0.0f);
         glm::vec3 scale = glm::vec3(getRandom() * 0.03f + 0.02f);
         glm::vec3 ke = glm::vec3(getRandom(), getRandom(), getRandom());
@@ -249,81 +249,6 @@ World::World(std::string& resDir, int texWidth, int texHeight, GLuint& frameBuff
 
 World::~World()
 {}
-
-void World::draw(std::shared_ptr<MatrixStack>& P, std::shared_ptr<MatrixStack>& MV)
-{
-    // Bind program
-    prog->bind();
-
-    // Set perspective
-    glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
-
-    // Bind lights
-    bindLights(MV);
-
-    // Draw lights
-    for(std::shared_ptr<Light> light : lights)
-    {
-        light->bind(prog);
-        MV->pushMatrix();
-        light->transform(MV);
-        Object::bindTransform(prog, MV);
-        light->draw(prog);
-        MV->popMatrix();
-    }
-
-    // Draw objects
-    for(std::shared_ptr<Object> obj : objs)
-    {
-        if(!obj->needsNewProgram())
-        {
-            obj->bind(prog);
-            MV->pushMatrix();
-            obj->transform(MV);
-            Object::bindTransform(prog, MV);
-            obj->draw(prog);
-            MV->popMatrix();
-        }
-    }
-
-    // Draw ground
-    ground->bind(prog);
-    MV->pushMatrix();
-    ground->transform(MV);
-    Object::bindTransform(prog, MV);
-    ground->draw(prog);
-    MV->popMatrix();
-
-    // Unbind program
-    prog->unbind();
-
-    // Bind surface program
-    surfaceProg->bind();
-
-    // Set perspective
-    glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, glm::value_ptr(P->topMatrix()));
-
-    // Bind lights
-    bindLights(MV);
-
-    // Draw remaining objects
-    float t = (float)glfwGetTime();
-    for(std::shared_ptr<Object> obj : objs)
-    {
-        if(obj->needsNewProgram())
-        {
-            obj->bind(surfaceProg, t);
-            MV->pushMatrix();
-            obj->transform(MV);
-            Object::bindTransform(surfaceProg, MV);
-            obj->draw(surfaceProg);
-            MV->popMatrix();
-        }
-    }
-
-    // Unbind surface program
-    surfaceProg->unbind();
-}
 
 void World::bindLights(std::shared_ptr<MatrixStack>& MV)
 {
