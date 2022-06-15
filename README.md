@@ -1,4 +1,18 @@
-# CSCE441-Assignment-3
+# Shaders
+Creates a program with various materials, lights, and shaders.
 
-Cameron Bourque  
-Highest task: Task 6 
+# Build
+mkdir build
+cd build
+cmake ../src
+make -j
+
+# Run
+./A3 ../resources
+
+# Controls
+m/M - cycle materials
+l/L - cycle lights
+x/X - move selected light in x
+y/Y - move selected light in y
+s/S - cycle shaders
